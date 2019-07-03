@@ -9,19 +9,18 @@ import requests
 import json
 import urllib.request
 import base64
-import uuid
+
 
 from datetime import datetime
 from django.template.loader import render_to_string, get_template
 from django.core.mail import EmailMultiAlternatives
 # importing the local variables
 from R_on_Cloud.settings import PROJECT_DIR
-from R_on_Cloud.config import (BIN)
-
-URL = "http://127.0.0.1:8001/rscript"
+from R_on_Cloud.config import (BIN, API_URL)
 
 
-def execute_code(code, token):
+def execute_code(code, session_id):
+    #session_id = self.request.session['session_id']
     # Check for system commands
     system_commands = re.compile(
         r'unix\(.*\)|unix_g\(.*\)|unix_w\(.*\)|'
@@ -35,12 +34,11 @@ def execute_code(code, token):
 
     code = re.sub(r"View\(", "print(", code)
 
-    session_id = uuid.uuid4()
-    user_id = uuid.uuid4()
-    body = {'code': code,
-            'user_id': user_id
-            }
-    req = urllib.request.Request(URL)
+    body = {
+            'code': code,
+            'user_id': session_id,
+    }
+    req = urllib.request.Request(API_URL)
     req.add_header('Content-Type', 'application/json; charset=utf-8')
     jsondata = json.dumps(body)
     jsondataasbytes = jsondata.encode('utf-8')

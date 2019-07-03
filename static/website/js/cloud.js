@@ -659,6 +659,7 @@ $(document.body).ready(function() {
             token: $(
                 "[name='csrfmiddlewaretoken']"
             ).val(),
+            session_id: $("#session_id").val() || 0,
             code: editor.getValue(),
             book_id: $("#books").val() || 0,
             chapter_id: $("#chapters").val() || 0,
