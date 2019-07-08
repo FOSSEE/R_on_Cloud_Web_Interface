@@ -37,6 +37,7 @@ function checkInput(){
 }
 /**************************** math captcha function end *******************/
 $(document.body).ready(function() {
+
     var editor = CodeMirror.fromTextArea(document.getElementById(
         "code"), {
         lineNumbers: true,
@@ -650,7 +651,6 @@ $(document.body).ready(function() {
     $plotbox_wrapper = $("#plotbox_wrapper");
     $plotbox = $("#plotbox");
 
-    var baseurl = window.location.origin + window.location.pathname;
     $(document).on("click", "#execute", function() {
         if(editor.getValue() != ""){
         ajax_loader(this);
@@ -660,6 +660,7 @@ $(document.body).ready(function() {
                 "[name='csrfmiddlewaretoken']"
             ).val(),
             session_id: $("#session_id").val() || 0,
+            R_file_id: $("#R_file_id").val() || 0,
             code: editor.getValue(),
             book_id: $("#books").val() || 0,
             chapter_id: $("#chapters").val() || 0,
@@ -672,18 +673,10 @@ $(document.body).ready(function() {
                     "Execute");
                 ajax_loader('clear');
                 result.setValue(data.output);
-                pp = baseurl + data.plot_path.slice(1);
-                url = pp;
-                if (data.plot_path) {
-                    $.ajax({
-                        type: "HEAD",
-                        async: true,
-                        url: pp,
-                    }).done(function() {
-                            if( data.plot_path != 0){
+                if(data.graph_exist){
                             $plot = $("<img>");
                             $plot.attr({
-                                src: data.plot_path,
+                                src: data.graph_path,
                                 width: '100%'
                             });
                             $plotbox.html($plot);
@@ -697,10 +690,8 @@ $(document.body).ready(function() {
                                 "download", dt +
                                 '.png');
                             $("#plot_download").attr(
-                                "href", data.plot_path
+                                "href", data.graph_path
                             );
-                        }
-                    });
                 }
             });
         }else{

@@ -121,9 +121,9 @@ class ExecutionHandler(tornado.web.RequestHandler):
         global request_count
         request_count += 1
         session_id = self.request.arguments['session_id'][0].decode('UTF-8')
-        code = self.request.arguments['code'][0]
-        code = code.decode('UTF-8')
-        data = yield executor.submit(execute_code, code, session_id,)
+        R_file_id = str(time.time())
+        code = self.request.arguments['code'][0].decode('UTF-8')
+        data = yield executor.submit(execute_code, code, session_id, R_file_id)
         self.write(data)
         request_count -= 1
 
