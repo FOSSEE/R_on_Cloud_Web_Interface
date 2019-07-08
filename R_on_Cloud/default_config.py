@@ -10,6 +10,7 @@ DB_PORT_DEFAULT = ''
 BIN = '/usr/bin/R'
 
 API_URL = "http://127.0.0.1:8001/rscript"
+API_URL_PLOT = "http://127.0.0.1:8001/file"
 
 SECRET_KEY_STRING = SECRET_KEY
 
