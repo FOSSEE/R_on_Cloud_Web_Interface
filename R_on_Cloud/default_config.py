@@ -12,6 +12,8 @@ BIN = '/usr/bin/R'
 API_URL = "http://127.0.0.1:8001/rscript"
 API_URL_PLOT = "http://127.0.0.1:8001/file"
 
+ALLOWED_HOST_IP = ['Host IP']
+
 SECRET_KEY_STRING = SECRET_KEY
 
 # request_count keeps track of the number of requests at hand, it is incremented
