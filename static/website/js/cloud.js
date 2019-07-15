@@ -1005,13 +1005,50 @@ $(document.body).ready(function() {
         e.preventDefault();
 
     });
-    //on hover pop the disclaimer
-    /*
-     $("#disclaimer").hover(function() {
-               $('#disclaimer-text').modal({
-            show: true
-        });
-      });
-     */
+
+$(document).on("click", "#fileuploadsubmit", function() {
+
+    if(confirm("Uploaded file last only till sesstion. Use direct file name for execution.")){
+        var name = doSubmit();
+        $("<span>" + name + "</span>").insertAfter("#uploaddataset");
+        $("#uploaddatasetModal").modal('hide');
+        $("#uploaddataset").hide();
+    }
+    else{
+        return false;
+    }
+
+  
+
+});
+
+$(document).on("click", "#reset", function() {
+    if(confirm("Are you sure you want to reset? Reset will clear of your data/uploaded file.")){
+        document.location.reload(true);
+    }
+    else{
+        return false;
+    }
+});
 
 }); //document.readOnly()
+
+function doSubmit(){
+    // Form Data
+    var formData = new FormData();
+
+    var fileSelect = document.getElementById("fileSelect");
+    if(fileSelect.files && fileSelect.files.length == 1){
+        var file = fileSelect.files[0]
+        formData.set("file", file , file.name);
+    }
+
+    var session_id = document.getElementById("session_id");
+    formData.set("session_id", session_id.value)
+    // Http Request  
+    var request = new XMLHttpRequest();
+    request.open('POST', "http://10.101.201.190:8001/upload");
+    request.send(formData);
+    return (fileSelect.files[0].name);
+}
+
