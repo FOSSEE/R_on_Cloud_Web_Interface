@@ -7,12 +7,15 @@ DB_HOST_DEFAULT = ''
 DB_PORT_DEFAULT = ''
 
 
-BIN = '/usr/bin/R'
+BIN = '/usr/bin/R' # Path of R bin file
 
 API_URL = "http://127.0.0.1:8001/rscript"
 API_URL_PLOT = "http://127.0.0.1:8001/file"
 
 ALLOWED_HOST_IP = ['Host IP']
+
+TORNADO_IP = '0.0.0.0'
+TORNADO_PORT = '8000' # default port
 
 SECRET_KEY_STRING = SECRET_KEY
 
