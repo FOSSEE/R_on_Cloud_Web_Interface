@@ -43,8 +43,10 @@ from tornado import gen
 from instances import execute_code
 import threading
 import pwd
+from R_on_Cloud.config import TORNADO_IP, TORNADO_PORT
 
-define('port', type=int, default=8000)
+define('port', type=int, default=TORNADO_PORT)
+define("ip", default=TORNADO_IP, help="Run on any given IP", type=str)
 
 # Custom settings
 from R_on_Cloud.settings import PROJECT_DIR
@@ -140,7 +142,7 @@ def main():
             ('.*', tornado.web.FallbackHandler, dict(fallback=wsgi_app)),
         ], debug=False)
     server = tornado.httpserver.HTTPServer(tornado_app)
-    server.listen(options.port)
+    server.listen(options.port, options.ip)
 
 
     try:

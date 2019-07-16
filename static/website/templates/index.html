@@ -215,6 +215,29 @@
                     <br>
                     <input type="hidden" id="session_id" name="session_id" value="{{ session_id }}">
                     <a id="execute" class="btn btn-dark text-white"><span id="execute-inner">Execute</span></a>
+                     <!-- Trigger the modal with a button -->
+                      <button id="uploaddataset" type="button" class="btn btn-dark text-white" data-toggle="modal" data-target="#uploaddatasetModal">Upload Dataset</button>
+                       <button id="reset" type="button" class="btn btn-dark text-white" data-dismiss="modal">Reset</button>
+
+                      <!-- Modal -->
+                      <div class="modal fade" id="uploaddatasetModal" role="dialog">
+                        <div class="modal-dialog">
+                          <!-- Modal content-->
+                          <div class="modal-content">
+                            <div class="modal-header">
+                            </div>
+                            <div class="modal-body">
+                            <form>
+                              <input type="file" id="fileSelect" accept="text/csv" />
+                              <button id="fileuploadsubmit" type="button" >Upload</button>
+                            </form>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
 
                 </div>
             </div>
@@ -571,14 +594,14 @@
         </div>
     </div>
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-82999923-4"></script>
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-82999923-4"></script>
     <script>
      window.dataLayer = window.dataLayer || [];
      function gtag(){dataLayer.push(arguments);}
      gtag('js', new Date());
 
      gtag('config', 'UA-82999923-4');
-    </script>
+    </script> -->
     <!-- -- diff wrapper ends---------------------------------- -->
     <script src="{% static 'website/bootstrap-4.1.0/js/jquery.min.js' %}"></script>
     <script src="{% static 'website/bootstrap-4.1.0/js/popper.min.js' %}"></script>
