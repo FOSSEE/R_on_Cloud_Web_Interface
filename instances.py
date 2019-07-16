@@ -26,11 +26,12 @@ def execute_code(code, session_id, R_file_id):
     system_commands = re.compile(
         r'unix\(.*\)|unix_g\(.*\)|unix_w\(.*\)|'
         r'unix_x\(.*\)|unix_s\(.*\)|host|newfun'
-        r'|execstr|ascii|mputl|dir\(\)'
+        r'|execstr|ascii|mputl|dir\(\)|'
+        r'system\(.*\)|system.call\(.*\)'
     )
     if system_commands.search(code):
         return {
-            'output': 'System Commands not allowed',
+            'output': 'System Commands are not allowed',
         }
 
     code = re.sub(r"View\(", "print(", code)
