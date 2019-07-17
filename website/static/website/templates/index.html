@@ -16,11 +16,14 @@
     <meta name="title" content="R computational resource, R high performance computing on demand">
     <meta name="description" content="R on Cloud facilitates execution of the codes for particular example(s) online. The results can then be verified with the solved example(s) from the textbook. It is also possible to change the values of the variables and in fact, the code itself, and execute it. In addition to the given examples, one can also copy and paste (or) write a new code in the input box provided and execute the same.">
     <meta name="keywords" content="R on cloud,R online execute,R online compiler,R computation,calcul scientifique,numerical computation,R computing online,R calculator">
-  <script>
-    if('{{ err_msg }}'){
-      alert('{{ err_msg }}');
-    }
-  </script>
+    <script>
+        var api_url_upload = "{{ api_url_upload }}";
+    </script>
+    <script>
+        if('{{ err_msg }}'){
+        alert('{{ err_msg }}');
+        }
+    </script>
 </head>
 
 <body>

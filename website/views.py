@@ -10,6 +10,7 @@ from . import utils
 from django.db import connections
 from .query import *
 
+
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
     columns = [col[0] for col in cursor.description]
@@ -17,6 +18,7 @@ def dictfetchall(cursor):
         dict(zip(columns, row))
         for row in cursor.fetchall()
     ]
+
 
 def catg(cat_id, all_cat):
     if all_cat is False:
@@ -46,28 +48,28 @@ def get_subcategories(maincat_id):
     return subcategories
 
 
-
 def get_books(category_id):
 
     with connections['r'].cursor() as cursor:
         cursor.execute(GET_TBC_PREFERENCE_FROM_CATEGORY_ID_SQL,
-                params=[category_id])
+                       params=[category_id])
         books = dictfetchall(cursor)
     return books
+
 
 def get_chapters(book_id):
     with connections['r'].cursor() as cursor:
         cursor.execute(GET_TBC_CHAPTER_SQL,
-            params=[book_id])
-        chapters  = dictfetchall(cursor)
+                       params=[book_id])
+        chapters = dictfetchall(cursor)
     return chapters
 
 
 def get_examples(chapter_id):
     with connections['r'].cursor() as cursor:
         cursor.execute(GET_TBC_EXAMPLE_SQL,
-            params=[chapter_id])
-        examples  = dictfetchall(cursor)
+                       params=[chapter_id])
+        examples = dictfetchall(cursor)
     return examples
 
 
@@ -81,7 +83,7 @@ def get_revisions(example_id):
 
 
 def get_code(file_path, commit_sha):
-    code= utils.get_file(file_path, commit_sha, main_repo=True)
+    code = utils.get_file(file_path, commit_sha, main_repo=True)
     return code
 
 
@@ -134,9 +136,10 @@ def index(request):
             context['revisions'] = get_revisions(example_id)
             with connections['r'].cursor() as cursor:
                 cursor.execute(GET_TBC_EXAMPLE_R_CLOUD_COMMENT_SQL,
-                    params=[example_id])
+                               params=[example_id])
                 review = cursor.fetchone()
-            review_url = "https://r.fossee.in/cloud_comments/" + str(example_id)
+            review_url = "https://r.fossee.in/cloud_comments/" + \
+                str(example_id)
             context['review'] = review[0]
             context['review_url'] = review_url
 
@@ -224,41 +227,40 @@ def index(request):
             try:
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_EXAMPLE_R_CLOUD_COMMENT_SQL,
-                        params=[eid])
+                                   params=[eid])
                     review = cursor.fetchone()
                 review_url = "https://r.fossee.in/cloud_comments/" + str(eid)
 
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_EXAMPLE_CHAPTER_ID_SQL,
-                            params=[eid])
+                                   params=[eid])
                     chapter_id = cursor.fetchone()
 
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_CHAPTER_DETAIL_SQL,
-                            params=[chapter_id[0]])
-                    chapters  = dictfetchall(cursor)
+                                   params=[chapter_id[0]])
+                    chapters = dictfetchall(cursor)
 
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_CHAPTER_PREFERENCE_ID_SQL,
-                            params=[chapter_id[0]])
+                                   params=[chapter_id[0]])
                     preference_id = cursor.fetchone()
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_PREFERENCE_DETAIL_CATEGORY_SQL,
-                            params=[preference_id[0]])
+                                   params=[preference_id[0]])
                     books_detail = cursor.fetchone()
                 books = get_books(books_detail[1])
                 maincat_id = books_detail[0]
                 subcat_id = books_detail[1]
 
-
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_EXAMPLE_FILE_SQL,
-                            params=[eid])
+                                   params=[eid])
                     example_file = cursor.fetchone()
                 example_file_filepath = example_file[4] + '/' + example_file[5]
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_EXAMPLE_VIEW_SQL,
-                            params=[eid])
+                                   params=[eid])
                     ex_views_count = cursor.fetchone()
 
                 request.session['maincat_id'] = maincat_id
@@ -326,13 +328,13 @@ def update_view_count(request):
         Example_chapter_id = cursor.fetchone()
     with connections['r'].cursor() as cursor:
         cursor.execute(INSERT_TBC_EXAMPLE_VIEW_SQL,
-            params=[ex_id,Example_chapter_id[0]])
+                       params=[ex_id, Example_chapter_id[0]])
     with connections['r'].cursor() as cursor:
         cursor.execute(UPDATE_TBC_EXAMPLE_VIEW_SQL,
-            params=[ex_id])
+                       params=[ex_id])
     with connections['r'].cursor() as cursor:
         cursor.execute(GET_TBC_EXAMPLE_VIEW_SQL,
-            params=[ex_id])
+                       params=[ex_id])
         Example_views_count = cursor.fetchone()
     data = Example_views_count[0]
     return HttpResponse(simplejson.dumps(data),
