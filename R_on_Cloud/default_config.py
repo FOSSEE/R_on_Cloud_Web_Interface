@@ -11,8 +11,9 @@ BIN = '/usr/bin/R' # Path of R bin file
 
 API_URL = "http://127.0.0.1:8001/rscript"
 API_URL_PLOT = "http://127.0.0.1:8001/file"
+API_URL_UPLOAD = "http://127.0.0.1:8001/upload"
 
-ALLOWED_HOST_IP = ['Host IP']
+ALLOWED_HOST_IP = ['127.0.0.1']
 
 TORNADO_IP = '0.0.0.0'
 TORNADO_PORT = '8000' # default port
