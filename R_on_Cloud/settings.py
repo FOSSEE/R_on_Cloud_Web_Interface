@@ -16,8 +16,6 @@ from .config import *
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.abspath(os.path.dirname(__file__) + '/../')
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -88,6 +86,18 @@ DATABASES = {
         'HOST': DB_HOST_DEFAULT,
         # Set to empty string for default.
         'PORT': DB_PORT_DEFAULT,
+    },
+    'r': {
+        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.mysql',
+        # Or path to database file if using sqlite3.
+        'NAME': DB_NAME_R_FOSSEE_IN,
+        'USER': DB_USER_R_FOSSEE_IN,
+        'PASSWORD': DB_PASS_R_FOSSEE_IN,
+        # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'HOST': DB_HOST_R_FOSSEE_IN,
+        # Set to empty string for default.
+        'PORT': DB_PORT_R_FOSSEE_IN,
     }
 }
 
@@ -129,11 +139,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    '/../static/',
-]
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
