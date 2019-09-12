@@ -106,9 +106,10 @@
                 <a href="#" class="extra-link col-sm-2" id="contributor">+Contributor</a>
             </div>
             <div id="books-wrapper" class="form-row form-group">
-                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold">Book :</label>
+                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold">Book : </label>
                 <select id="books" class="form-control-sm col-sm-8">
                     <option value="0">Select Book </option>
+
                     {% for book in books %} {% if book_id == book.id %}
                     <option value="{{ book.id }}" selected>{{ forloop.counter }} - {{ book.book }} (by {{ book.author }})</option>
                     {% else %}

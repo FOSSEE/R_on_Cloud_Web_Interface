@@ -16,7 +16,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from textwrap import dedent
 from R_on_Cloud.config import FROM_EMAIL, TO_EMAIL, CC_EMAIL, BCC_EMAIL
 from R_on_Cloud.config import UPLOADS_PATH
-from website.views import catg
+from website.views import catg, dictfetchall
 from website.models import *
 from website.forms import BugForm, RevisionForm, issues
 
@@ -115,7 +115,6 @@ def chapters(request):
                     'chapter': obj[2],
 
                 }
-                print(obj.name)
                 response_dict.append(response)
             return HttpResponse(simplejson.dumps(response_dict),
                                 content_type='application/json')
@@ -194,21 +193,22 @@ def code(request):
         if not example_id:
             example_id = int(request.GET.get('example_id'))
         file_path = request.session['filepath']
-        review = ScilabCloudComment.objects.using('r')\
-            .filter(example=example_id).count()
+        #review = ScilabCloudComment.objects.using('r')\
+        #    .filter(example=example_id).count()
+        review = 0
         with connections['r'].cursor() as cursor:
-            cursor.execute(GET_TBC_EXAMPLE_FILE_VIEW_SQL, params=[example_id])
+            cursor.execute(GET_TBC_EXAMPLE_VIEW_SQL, params=[example_id])
             exmple = cursor.fetchone()
         review_url = "https://scilab.in/cloud_comments/" + str(example_id)
         # example_path = UPLOADS_PATH + '/' + file_path
 
         file = utils.get_file(file_path, commit_sha, main_repo=True)
-        code = base64.b64decode(file['content'])
+        code = file
         response = {
-            'code': code.decode('UTF-8'),
+            'code': code,
             'review': review,
             'review_url': review_url,
-            'exmple': exmple[1]
+            'exmple': exmple[0]
         }
         # response_dict.append(response)
         return HttpResponse(simplejson.dumps(response),
@@ -225,15 +225,13 @@ def contributor(request):
         with connections['r'].cursor() as cursor:
             cursor.execute(GET_TBC_CONTRIBUTOR_DETAILS_SQL, params=[book_id])
             contributor = cursor.fetchone()
-
-        for obj in contributor:
-            response = {
-                "contributor_name": obj[1],
-                "proposal_faculty": obj[2],
-                "proposal_reviewer": obj[3],
-                "proposal_university": obj[4],
-            }
-            response_dict.append(response)
+        response = {
+            "contributor_name": contributor[1],
+            "proposal_faculty": contributor[2],
+            "proposal_reviewer": contributor[3],
+            "proposal_university": contributor[4],
+        }
+        response_dict.append(response)
     return HttpResponse(simplejson.dumps(response),
                         content_type='application/json')
 
@@ -271,13 +269,10 @@ def bug_form_submit(request):
         book_id = request.GET.get('book_id')
         chapter_id = request.GET.get('chapter_id')
         ex_id = request.GET.get('ex_id')
-        form = BugForm(deserialize_form(form))
-        print(form)
         if form.is_valid():
             comment = form.cleaned_data['description']
             error = form.cleaned_data['issue']
             email = form.cleaned_data['email']
-            print(comment)
             comment_data = TextbookCompanionPreference.objects\
                 .db_manager('r').raw(dedent("""\
                     SELECT 1 as id, tcp.book as book, tcp.author as author,
@@ -448,9 +443,9 @@ def diff(request):
     context = {}
     file_path = request.session['filepath']
     file = utils.get_file(file_path, diff_commit_sha, main_repo=True)
-    code = base64.b64decode(file['content'])
+    code = file
     response = {
-        'code2': code.decode('UTF-8'),
+        'code2': code,
     }
     return HttpResponse(simplejson.dumps(response),
                         content_type='application/json')
@@ -462,7 +457,6 @@ def diff(request):
 def review_revision(request):
     if request.is_ajax():
         revision_id = request.GET.get('revision_id')
-        print(revision_id)
         revision = TextbookCompanionRevision.objects.using(
             'r').get(id=revision_id)
         file = utils.get_file(revision.example_file.filepath,
@@ -498,8 +492,6 @@ def push_revision(request):
         code = code.decode('UTF-8')
         revision = TextbookCompanionRevision.objects.using(
             'r').get(id=request.session['revision_id'])
-
-        print('pushing to repo')
         utils.update_file(
             revision.example_file.filepath,
             revision.commit_message,
@@ -507,8 +499,6 @@ def push_revision(request):
             [revision.committer_name, revision.committer_email],
             branch='master',
             main_repo=True)
-
-        print('update push_status')
         revision.push_status = True
         revision.save()
 

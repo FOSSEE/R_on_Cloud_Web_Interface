@@ -15,5 +15,6 @@ urlpatterns = [
     path('get_code/', ajax.code, name='code'),
     path('get_diff/', ajax.diff, name='diff'),
     path('update_view_count/', views.update_view_count,
-        name='update_view_count')
+        name='update_view_count'),
+    path('get_contributor/', ajax.contributor, name='contributor'),
     ]

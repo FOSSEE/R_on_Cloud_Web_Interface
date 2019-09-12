@@ -472,6 +472,7 @@ $(document.body).ready(function() {
             $("#databox-wrapper").hide();
             editor.setValue("");
             result.setValue("");
+            console.log(example_id);
             ajax_loader('#revisions');
             $.ajax({
                 url: 'get_revisions/',
@@ -489,8 +490,8 @@ $(document.body).ready(function() {
                         data: {
                             ex_id: ex_id,
                         },
-                        success: function(data) {
-                            $("#example_views_count").text(data);
+                        success: function(data1) {
+                            $("#example_views_count").text(data1);
                         }
                     });
                     $("#revisions").html(
@@ -498,30 +499,30 @@ $(document.body).ready(function() {
                     );
 
                     var i = 1;
-                    data.forEach(
-                        function(
-                            item) {
-                            $('#revisions').append(
-                                '<option value="' + item.commit_sha + '"> ' +
-                                i + ' - ' + item.commit_message +
+                    $.each(data, function(key, value){
+                        $.each(value, function(key, value){
+                        $('#revisions').append(
+                                '<option value="' + value[1] + '"> ' +
+                                i + ' - ' + value[0]+
                                 '</option>'
-                            );
-                            i++;
+                        );
+                        i++;
                         });
+                    });
                     $("#revisions-diff").html(
                         ' <option value="">Select a revision</option>'
                     );
                     var i = 1;
-                    data.forEach(
-                        function(
-                            item) {
-                            $('#revisions-diff').append(
-                                '<option value="' + item.commit_sha + '"> ' +
-                                i + ' - ' + item.commit_message +
+                    $.each(data, function(key, value){
+                        $.each(value, function(key, value){
+                        $('#revisions-diff').append(
+                                '<option value="' + value[1] + '"> ' +
+                                i + ' - ' + value[0]+
                                 '</option>'
-                            );
-                            i++;
+                        );
+                        i++;
                         });
+                    });
                     $(
                         '#revisions option:eq(1)'
                     ).prop(
@@ -704,21 +705,21 @@ $(document.body).ready(function() {
     /********************************************/
     $(document).on("click", "#download-book", function(e) {
         window.location =
-            "http://r.fossee.in/download/book/" + $(
+            "http://r.fossee.in/textbook-companion/download/book/" + $(
                 "#books").val();
         e.preventDefault();
     });
 
     $(document).on("click", "#download-chapter", function(e) {
         window.location =
-            "http://r.fossee.in/download/chapter/" +
+            "http://r.fossee.in/textbook-companion/download/chapter/" +
             $("#chapters").val();
         e.preventDefault();
     });
 
     $(document).on("click", "#download-example", function(e) {
         window.location =
-            "http://r.fossee.in/download/example/" +
+            "http://r.fossee.in/textbook-companion/download/example/" +
             $("#examples").val();
         e.preventDefault();
     });

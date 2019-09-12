@@ -49,10 +49,10 @@ GET_TBC_EXAMPLE_FILE_SQL = """
                 """
 
 
-GET_TBC_EXAMPLE_FILE_VIEW_SQL = """
-                SELECT id, views_count FROM textbook_companion_example_views
-                WHERE example_id = %s
-                """
+# GET_TBC_EXAMPLE_FILE_VIEW_SQL = """
+#                SELECT id, views_count FROM textbook_companion_example_views
+#               WHERE example_id = %s
+#               """
 
 
 GET_TBC_CONTRIBUTOR_DETAILS_SQL = """
@@ -65,3 +65,86 @@ GET_TBC_CONTRIBUTOR_DETAILS_SQL = """
                 INNER JOIN textbook_companion_preference preference
                 ON proposal.id = preference.proposal_id
                 WHERE preference.id = %s
+                """
+
+GET_TBC_CHAPTER_ID_SQL = """
+                SELECT chapter_id FROM textbook_companion_example WHERE id = %s
+                """
+
+INSERT_TBC_EXAMPLE_VIEW_SQL = """
+                INSERT INTO textbook_companion_example_views
+                (example_id,chapter_id) VALUES(%s, %s)
+                """
+
+UPDATE_TBC_EXAMPLE_VIEW_SQL = """
+                UPDATE textbook_companion_example_views
+                SET views_count = views_count + 1 WHERE example_id = %s
+                """
+
+GET_TBC_EXAMPLE_VIEW_SQL = """
+                SELECT views_count FROM textbook_companion_example_views
+                WHERE example_id = %s
+                """
+
+GET_TBC_EXAMPLE_R_CLOUD_COMMENT_SQL = """
+                SELECT COUNT(id) FROM r_cloud_comment WHERE example= %s
+                """
+
+GET_TBC_EXAMPLE_CHAPTER_ID_SQL = """
+                SELECT DISTINCT(chapter_id)
+                FROM textbook_companion_example
+                WHERE cloud_err_status=0 AND chapter_id = (
+                SELECT chapter_id FROM textbook_companion_example
+                WHERE id = %s )
+                """
+
+GET_TBC_CHAPTER_PREFERENCE_ID_SQL = """
+                SELECT DISTINCT(preference_id)
+                FROM textbook_companion_chapter
+                WHERE cloud_chapter_err_status = 0
+                AND preference_id = (SELECT preference_id
+                FROM textbook_companion_chapter WHERE id = %s)
+                """
+
+GET_TBC_PREFERENCE_DETAIL_CATEGORY_SQL = """
+                SELECT DISTINCT (loc.category_id),
+                tcbm.sub_category,loc.maincategory, pe.book as book,
+                pe.author as author, pe.publisher as publisher,
+                pe.year as year, pe.id as pe_id, pe.edition, pe.id as pref_id
+                FROM textbook_companion_preference pe
+                INNER JOIN textbook_companion_proposal po 
+                ON pe.proposal_id = po.id
+                INNER JOIN textbook_companion_book_main_subcategories tcbm
+                ON pe.id = tcbm.pref_id
+                INNER JOIN list_of_category loc
+                ON tcbm.main_category = loc.category_id
+                WHERE po.proposal_status = 3 AND pe.approval_status = 1
+                AND pe.id = tcbm.pref_id AND pe.cloud_pref_err_status = 0
+                AND pe.id= %s
+                """
+
+GET_TBC_PREFERENCE_FROM_CATEGORY_ID_SQL = """
+                SELECT DISTINCT (loc.category_id),pe.id,
+                tcbm.sub_category,loc.maincategory, pe.book as
+                book,loc.category_id,tcbm.sub_category,
+                pe.author as author, pe.publisher as publisher,
+                pe.year as year, pe.id as pe_id, pe.edition,
+                po.approval_date as approval_date
+                FROM textbook_companion_preference pe INNER JOIN
+                textbook_companion_proposal po ON pe.proposal_id = po.id
+                INNER JOIN textbook_companion_book_main_subcategories
+                tcbm ON pe.id = tcbm.pref_id INNER JOIN list_of_category
+                loc ON tcbm.main_category = loc.category_id 
+                WHERE po.proposal_status = 3 AND pe.approval_status = 1
+                AND pe.id = tcbm.pref_id AND pe.cloud_pref_err_status = 0
+                AND tcbm.sub_category = %s
+                """
+
+GET_TBC_CHAPTER_DETAIL_SQL = """
+                SELECT id, name, number, preference_id
+                FROM textbook_companion_chapter
+                WHERE cloud_chapter_err_status = 0 AND
+                preference_id = (SELECT preference_id
+                FROM textbook_companion_chapter WHERE id = %s)
+                ORDER BY number ASC
+                """

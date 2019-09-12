@@ -9,7 +9,7 @@
 *.swo
 *.pyc
 
-
-static/log/*.txt
-static/tmp/*.R
+static/*.*
+website/static/log/*.txt
+website/static/tmp/*.R
 R_on_Cloud/config.py
