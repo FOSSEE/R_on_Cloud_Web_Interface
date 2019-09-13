@@ -46,7 +46,6 @@ def execute_code(code, session_id, R_file_id):
     jsondata = json.dumps(body)
     jsondataasbytes = jsondata.encode('utf-8')
     req.add_header('Content-Length', len(jsondataasbytes))
-    print(jsondataasbytes)
     result = urllib.request.urlopen(req, jsondataasbytes)
     result = result.read().decode("utf8")
     output = json.loads(result)["output"]

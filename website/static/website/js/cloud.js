@@ -547,8 +547,7 @@ $(document.body).ready(function() {
                                 $("#review").hide();
                             }
                             $("#example_views_count").text(data.exmple);
-                            editor.setValue("clear; // Remove clear, clc from code if you want to access existing stored variable from the memory" +
-                                "\n" + "\n" + data.code);
+                            editor.setValue(data.code);
                             initial_code = editor.getValue();
                             ajax_loader("clear");
                         }
