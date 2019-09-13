@@ -15,7 +15,6 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 # from django.db.models import Q
 from textwrap import dedent
 from R_on_Cloud.config import FROM_EMAIL, TO_EMAIL, CC_EMAIL, BCC_EMAIL
-from R_on_Cloud.config import UPLOADS_PATH
 from website.views import catg, dictfetchall
 from website.models import *
 from website.forms import BugForm, RevisionForm, issues
@@ -200,7 +199,6 @@ def code(request):
             cursor.execute(GET_TBC_EXAMPLE_VIEW_SQL, params=[example_id])
             exmple = cursor.fetchone()
         review_url = "https://scilab.in/cloud_comments/" + str(example_id)
-        # example_path = UPLOADS_PATH + '/' + file_path
 
         file = utils.get_file(file_path, commit_sha, main_repo=True)
         code = file
