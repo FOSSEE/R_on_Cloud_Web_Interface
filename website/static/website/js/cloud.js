@@ -87,6 +87,7 @@ $(document.body).ready(function() {
     $toggle_code = $("#toggle-code");
 
     $fullscreen_code.click(function(e) {
+        alert("Press escape to exit from fullScreen mode");
         editor.setOption("fullScreen", !editor.getOption(
             "fullScreen"));
         editor.focus();
@@ -106,6 +107,7 @@ $(document.body).ready(function() {
     $toggle_result = $("#toggle-result");
 
     $fullscreen_result.click(function(e) {
+        alert("Press escape to exit from fullScreen mode");
         result.setOption("fullScreen", !result.getOption(
             "fullScreen"));
         result.focus();
@@ -755,7 +757,9 @@ $(document.body).ready(function() {
     /****** Bug form handling *******************/
     /********************************************/
     $(document).on("click", "#bug", function(e) {
-
+        alert("This form is under development");
+        $("#bug_form_wrapper").modal('hide');
+        return false;
         $.ajax({
             url: 'get_bug_form/',
             dataType: 'JSON',
