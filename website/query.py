@@ -48,13 +48,6 @@ GET_TBC_EXAMPLE_FILE_SQL = """
                 WHERE tcef.filetype = 'S' AND tcef.example_id = %s
                 """
 
-
-# GET_TBC_EXAMPLE_FILE_VIEW_SQL = """
-#                SELECT id, views_count FROM textbook_companion_example_views
-#               WHERE example_id = %s
-#               """
-
-
 GET_TBC_CONTRIBUTOR_DETAILS_SQL = """
                 SELECT preference.id,
                 proposal.full_name as proposal_full_name,

@@ -661,7 +661,7 @@ $(document.body).ready(function() {
             token: $(
                 "[name='csrfmiddlewaretoken']"
             ).val(),
-            session_id: $("#session_id").val() || 0,
+            user_id: $("#user_id").val() || 0,
             R_file_id: $("#R_file_id").val() || 0,
             code: editor.getValue(),
             book_id: $("#books").val() || 0,
@@ -675,6 +675,10 @@ $(document.body).ready(function() {
                     "Execute");
                 ajax_loader('clear');
                 result.setValue(data.output);
+                if (data.error.length != 0)
+                {
+                    alert(data.error);
+                }
                 if(data.graph_exist){
                             $plot = $("<img>");
                             $plot.attr({
@@ -1044,8 +1048,8 @@ function doSubmit(){
     if(fileSelect.files && fileSelect.files.length == 1){
         var file = fileSelect.files[0]
         formData.set("file", file , file.name);
-	 var session_id = document.getElementById("session_id");
-    formData.set("session_id", session_id.value)
+        var user_id = document.getElementById("user_id");
+    formData.set("user_id", user_id.value)
     // Http Request
     var request = new XMLHttpRequest();
     request.open('POST', api_url_upload);

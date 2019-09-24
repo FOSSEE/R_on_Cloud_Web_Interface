@@ -3,10 +3,7 @@ from django.http import HttpResponse
 from django.template import loader
 import requests
 import uuid
-<<<<<<< HEAD
-=======
 from R_on_Cloud.config import (API_URL_UPLOAD)
->>>>>>> fixed conflict
 from website.models import *
 from django.db.models import Q
 import json as simplejson
@@ -14,10 +11,7 @@ from . import utils
 from django.db import connections
 from .query import *
 
-<<<<<<< HEAD
 
-=======
->>>>>>> fixed conflict
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
     columns = [col[0] for col in cursor.description]
@@ -26,10 +20,7 @@ def dictfetchall(cursor):
         for row in cursor.fetchall()
     ]
 
-<<<<<<< HEAD
 
-=======
->>>>>>> fixed conflict
 def catg(cat_id, all_cat):
     if all_cat is False:
         category = TextbookCompanionCategoryList.objects.using('r')\
@@ -58,15 +49,10 @@ def get_subcategories(maincat_id):
     return subcategories
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> fixed conflict
 def get_books(category_id):
 
     with connections['r'].cursor() as cursor:
         cursor.execute(GET_TBC_PREFERENCE_FROM_CATEGORY_ID_SQL,
-<<<<<<< HEAD
                        params=[category_id])
         books = dictfetchall(cursor)
     return books
@@ -77,30 +63,15 @@ def get_chapters(book_id):
         cursor.execute(GET_TBC_CHAPTER_SQL,
                        params=[book_id])
         chapters = dictfetchall(cursor)
-=======
-                params=[category_id])
-        books = dictfetchall(cursor)
-    return books
 
-def get_chapters(book_id):
-    with connections['r'].cursor() as cursor:
-        cursor.execute(GET_TBC_CHAPTER_SQL,
-            params=[book_id])
-        chapters  = dictfetchall(cursor)
->>>>>>> fixed conflict
     return chapters
 
 
 def get_examples(chapter_id):
     with connections['r'].cursor() as cursor:
         cursor.execute(GET_TBC_EXAMPLE_SQL,
-<<<<<<< HEAD
                        params=[chapter_id])
         examples = dictfetchall(cursor)
-=======
-            params=[chapter_id])
-        examples  = dictfetchall(cursor)
->>>>>>> fixed conflict
     return examples
 
 
@@ -114,36 +85,19 @@ def get_revisions(example_id):
 
 
 def get_code(file_path, commit_sha):
-<<<<<<< HEAD
+
     code = utils.get_file(file_path, commit_sha, main_repo=True)
-=======
-    code= utils.get_file(file_path, commit_sha, main_repo=True)
->>>>>>> fixed conflict
     return code
 
 
 def index(request):
     context = {}
-<<<<<<< HEAD
-=======
-    session_id = uuid.uuid4()
-    context['session_id'] = str(session_id)
+    user_id = uuid.uuid4()
+    context['user_id'] = str(user_id)
     context['api_url_upload'] = API_URL_UPLOAD
-    request.session['session_id'] = str(session_id)
->>>>>>> fixed conflict
+    request.session['user_id'] = str(user_id)
     book_id = request.GET.get('book_id')
     user = request.user
-
-    # if not user.is_anonymous():
-    #     social = user.social_auth.get(provider='google-oauth2')
-    #     url = 'https://www.googleapis.com/plus/v1/people/me'
-    #     params = {'access_token': social.extra_data['access_token']}
-    #     # r = requests.get(url, params=params)
-    #     # print(r.content)
-
-    #     context = {
-    #         'user': user
-    #     }
 
     if not (request.GET.get('eid') or request.GET.get('book_id')):
         catg_all = catg(None, all_cat=True)
@@ -178,16 +132,10 @@ def index(request):
             context['revisions'] = get_revisions(example_id)
             with connections['r'].cursor() as cursor:
                 cursor.execute(GET_TBC_EXAMPLE_R_CLOUD_COMMENT_SQL,
-<<<<<<< HEAD
                                params=[example_id])
                 review = cursor.fetchone()
             review_url = "https://r.fossee.in/cloud_comments/" + \
                 str(example_id)
-=======
-                    params=[example_id])
-                review = cursor.fetchone()
-            review_url = "https://r.fossee.in/cloud_comments/" + str(example_id)
->>>>>>> fixed conflict
             context['review'] = review[0]
             context['review_url'] = review_url
 
@@ -202,6 +150,7 @@ def index(request):
                 session_code = get_code(
                     request.session['filepath'], commit_sha)
                 context['code'] = session_code
+        context['user_id'] = request.session['user_id']
         template = loader.get_template('index.html')
         return HttpResponse(template.render(context, request))
     elif book_id:
@@ -275,26 +224,19 @@ def index(request):
             try:
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_EXAMPLE_R_CLOUD_COMMENT_SQL,
-<<<<<<< HEAD
                                    params=[eid])
-=======
-                        params=[eid])
->>>>>>> fixed conflict
+
                     review = cursor.fetchone()
                 review_url = "https://r.fossee.in/cloud_comments/" + str(eid)
 
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_EXAMPLE_CHAPTER_ID_SQL,
-<<<<<<< HEAD
                                    params=[eid])
-=======
-                            params=[eid])
->>>>>>> fixed conflict
+
                     chapter_id = cursor.fetchone()
 
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_CHAPTER_DETAIL_SQL,
-<<<<<<< HEAD
                                    params=[chapter_id[0]])
                     chapters = dictfetchall(cursor)
 
@@ -305,42 +247,24 @@ def index(request):
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_PREFERENCE_DETAIL_CATEGORY_SQL,
                                    params=[preference_id[0]])
-=======
-                            params=[chapter_id[0]])
-                    chapters  = dictfetchall(cursor)
-
-                with connections['r'].cursor() as cursor:
-                    cursor.execute(GET_TBC_CHAPTER_PREFERENCE_ID_SQL,
-                            params=[chapter_id[0]])
-                    preference_id = cursor.fetchone()
-                with connections['r'].cursor() as cursor:
-                    cursor.execute(GET_TBC_PREFERENCE_DETAIL_CATEGORY_SQL,
-                            params=[preference_id[0]])
->>>>>>> fixed conflict
                     books_detail = cursor.fetchone()
                 books = get_books(books_detail[1])
                 maincat_id = books_detail[0]
                 subcat_id = books_detail[1]
 
-<<<<<<< HEAD
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_EXAMPLE_FILE_SQL,
                                    params=[eid])
-=======
 
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_EXAMPLE_FILE_SQL,
-                            params=[eid])
->>>>>>> fixed conflict
+                                   params=[eid])
+
                     example_file = cursor.fetchone()
                 example_file_filepath = example_file[4] + '/' + example_file[5]
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_EXAMPLE_VIEW_SQL,
-<<<<<<< HEAD
                                    params=[eid])
-=======
-                            params=[eid])
->>>>>>> fixed conflict
                     ex_views_count = cursor.fetchone()
 
                 request.session['maincat_id'] = maincat_id
@@ -399,10 +323,7 @@ def index(request):
 
             template = loader.get_template('index.html')
             return HttpResponse(template.render(context, request))
-<<<<<<< HEAD
 
-=======
->>>>>>> fixed conflict
 
 def update_view_count(request):
     ex_id = request.GET.get('ex_id')
@@ -411,7 +332,6 @@ def update_view_count(request):
         Example_chapter_id = cursor.fetchone()
     with connections['r'].cursor() as cursor:
         cursor.execute(INSERT_TBC_EXAMPLE_VIEW_SQL,
-<<<<<<< HEAD
                        params=[ex_id, Example_chapter_id[0]])
     with connections['r'].cursor() as cursor:
         cursor.execute(UPDATE_TBC_EXAMPLE_VIEW_SQL,
@@ -419,15 +339,6 @@ def update_view_count(request):
     with connections['r'].cursor() as cursor:
         cursor.execute(GET_TBC_EXAMPLE_VIEW_SQL,
                        params=[ex_id])
-=======
-            params=[ex_id,Example_chapter_id[0]])
-    with connections['r'].cursor() as cursor:
-        cursor.execute(UPDATE_TBC_EXAMPLE_VIEW_SQL,
-            params=[ex_id])
-    with connections['r'].cursor() as cursor:
-        cursor.execute(GET_TBC_EXAMPLE_VIEW_SQL,
-            params=[ex_id])
->>>>>>> fixed conflict
         Example_views_count = cursor.fetchone()
     data = Example_views_count[0]
     return HttpResponse(simplejson.dumps(data),
