@@ -89,15 +89,17 @@ def get_code(file_path, commit_sha):
     code = utils.get_file(file_path, commit_sha, main_repo=True)
     return code
 
-
 def index(request):
     context = {}
     user_id = uuid.uuid4()
-    context['user_id'] = str(user_id)
     context['api_url_upload'] = API_URL_UPLOAD
-    request.session['user_id'] = str(user_id)
     book_id = request.GET.get('book_id')
     user = request.user
+    if(request.session['user_id']):
+        context['user_id'] = request.session['user_id']
+    else:
+        context['user_id'] = str(user_id)
+        request.session['user_id'] = str(user_id)
 
     if not (request.GET.get('eid') or request.GET.get('book_id')):
         catg_all = catg(None, all_cat=True)

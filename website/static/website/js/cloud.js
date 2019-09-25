@@ -679,24 +679,21 @@ $(document.body).ready(function() {
                 {
                     alert(data.error);
                 }
-                if(data.graph_exist){
+                if(data.plot_exist =='True'){
                             $plot = $("<img>");
                             $plot.attr({
-                                src: data.graph_path,
+                                src: data.plot_path,
                                 width: '100%'
                             });
                             $plotbox.html($plot);
                             $plotbox_wrapper.modal('show');
-                            var dt = $(
-                                    "#examples option:selected"
-                                )
-                                .text();
+                            var dt = new Date().getTime();
                             $("#plot_download").show();
                             $("#plot_download").attr(
                                 "download", dt +
                                 '.png');
                             $("#plot_download").attr(
-                                "href", data.graph_path
+                                "href", data.plot_path
                             );
                 }
             });

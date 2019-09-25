@@ -1,6 +1,7 @@
 # importing the global modules
 import pexpect
 import os
+import os.path
 import re
 import time
 import sys
@@ -15,7 +16,7 @@ from django.template.loader import render_to_string, get_template
 from django.core.mail import EmailMultiAlternatives
 # importing the local variables
 from R_on_Cloud.settings import PROJECT_DIR
-from R_on_Cloud.config import (BIN, API_URL, API_URL_PLOT)
+from R_on_Cloud.config import (BIN, API_URL, TEMP_DIR)
 
 
 def execute_code(code, user_id, R_file_id):
@@ -35,29 +36,29 @@ def execute_code(code, user_id, R_file_id):
     code = re.sub(r"View\(", "print(", code)
 
     body = {
-            'code': code,
-            'user_id': user_id,
-            'R_file_id': R_file_id,
+        'code': code,
+        'user_id': user_id,
+        'R_file_id': R_file_id,
     }
     headers = {
         "Content-Type": "application/json",
         "Accept": "application/json",
     }
     jsondata = json.dumps(body)
-    #jsondata = urllib.parse.urlencode(body)
-    #print(jsondata)
-
-    result=requests.post(API_URL, json=jsondata, headers=headers)
+    if not os.path.exists(TEMP_DIR):
+        os.makedirs(TEMP_DIR)
+    result = requests.post(API_URL, json=jsondata, headers=headers)
     output = result.json()
-    output_data= json.dumps(output['data'])
-    output_error = json.dumps(output['error'])
-    graph_exist = ""
-    graph_path = ""
+    output_data = json.loads(json.dumps(output['data']))
+    output_error = json.loads(json.dumps(output['error']))
+    plot_exist = json.loads(json.dumps(output['is_plot']))
+    plot_path_req = json.loads(json.dumps(output['plot_path_req']))
+
     data = {
-        'output': json.loads(output_data),
-        'error': json.loads(output_error)
-        #'graph_exist': graph_exist,
-        #'graph_path': graph_path,
+        'output': output_data,
+        'error': output_error,
+        'plot_exist': plot_exist,
+        'plot_path': plot_path_req,
     }
     return data
 
