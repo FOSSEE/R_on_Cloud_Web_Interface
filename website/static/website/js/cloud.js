@@ -674,27 +674,29 @@ $(document.body).ready(function() {
                 $("#execute-inner").html(
                     "Execute");
                 ajax_loader('clear');
-                result.setValue(data.output);
                 if (data.error.length != 0)
                 {
                     alert(data.error);
                 }
-                if(data.plot_exist =='True'){
-                            $plot = $("<img>");
-                            $plot.attr({
-                                src: data.plot_path,
-                                width: '100%'
-                            });
-                            $plotbox.html($plot);
-                            $plotbox_wrapper.modal('show');
-                            var dt = new Date().getTime();
-                            $("#plot_download").show();
-                            $("#plot_download").attr(
-                                "download", dt +
-                                '.png');
-                            $("#plot_download").attr(
-                                "href", data.plot_path
-                            );
+                else{
+                    result.setValue(data.output);
+                    if(data.plot_exist =='True'){
+                                $plot = $("<img>");
+                                $plot.attr({
+                                    src: data.plot_path,
+                                    width: '100%'
+                                });
+                                $plotbox.html($plot);
+                                $plotbox_wrapper.modal('show');
+                                var dt = new Date().getTime();
+                                $("#plot_download").show();
+                                $("#plot_download").attr(
+                                    "download", dt +
+                                    '.png');
+                                $("#plot_download").attr(
+                                    "href", data.plot_path
+                                );
+                    }
                 }
             });
         }else{
@@ -1048,6 +1050,7 @@ function doSubmit(){
         var user_id = document.getElementById("user_id");
     formData.set("user_id", user_id.value)
     // Http Request
+
     var request = new XMLHttpRequest();
     request.open('POST', api_url_upload);
     request.send(formData);

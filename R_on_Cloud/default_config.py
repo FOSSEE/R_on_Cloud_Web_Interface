@@ -13,9 +13,13 @@ DB_PORT_R_FOSSEE_IN = ''
 BIN = '/usr/bin/R'
 
 API_URL = "http://127.0.0.1:8001/rscript"
-API_URL_UPLOAD = "http://127.0.0.1:8001/upload"
+API_URL_UPLOAD = "http://127.0.0.1:8001/upload-temp-file"
 API_URL_PLOT = "http://127.0.0.1:8001/file"
 API_URL_SERVER = "http://127.0.0.1:8001/"
+AUTH_KEY = 'Secret key' # Same key as in web API
+API_URL_RESET = "http://127.0.0.1:8001/reset"
+
+
 UPLOADS_PATH = "TBC upload directory path"
 MAIN_REPO = "TBC upload directory path"
 

@@ -89,13 +89,15 @@ def get_code(file_path, commit_sha):
     code = utils.get_file(file_path, commit_sha, main_repo=True)
     return code
 
+
 def index(request):
     context = {}
     user_id = uuid.uuid4()
     context['api_url_upload'] = API_URL_UPLOAD
+    context['reset_req_url'] = API_URL_RESET
     book_id = request.GET.get('book_id')
     user = request.user
-    if(request.session['user_id']):
+    if 'user_id' in request.session:
         context['user_id'] = request.session['user_id']
     else:
         context['user_id'] = str(user_id)
@@ -153,6 +155,8 @@ def index(request):
                     request.session['filepath'], commit_sha)
                 context['code'] = session_code
         context['user_id'] = request.session['user_id']
+        context['reset_req_url'] = API_URL_RESET
+
         template = loader.get_template('index.html')
         return HttpResponse(template.render(context, request))
     elif book_id:
@@ -182,7 +186,8 @@ def index(request):
                 'err_msg': """This book is not supported by Scilab on Cloud."""
                            """ You are redirected to home page."""
             }
-
+            context['api_url_upload'] = API_URL_UPLOAD
+            context['reset_req_url'] = API_URL_RESET
             template = loader.get_template('index.html')
             return HttpResponse(template.render(context, request))
 
@@ -208,6 +213,8 @@ def index(request):
             'book_id': int(book_id),
 
         }
+        context['api_url_upload'] = API_URL_UPLOAD
+        context['reset_req_url'] = API_URL_RESET
         template = loader.get_template('index.html')
         return HttpResponse(template.render(context, request))
     else:
@@ -219,6 +226,8 @@ def index(request):
                 'err_msg': """This example is currently not available on """
                            """scilab on cloud."""
             }
+            context['api_url_upload'] = API_URL_UPLOAD
+            context['reset_req_url'] = API_URL_RESET
             template = loader.get_template('index.html')
             return HttpResponse(template.render(context, request))
 
@@ -290,6 +299,7 @@ def index(request):
                     'err_msg': """This example is currently not available on"""
                                """ scilab on cloud."""
                 }
+                context['api_url_upload'] = API_URL_UPLOAD
                 template = loader.get_template('index.html')
                 return HttpResponse(template.render(context, request))
             subcateg_all = TextbookCompanionSubCategoryList.objects\
@@ -322,7 +332,8 @@ def index(request):
 
             # if not user.is_anonymous():
             #    context['user'] = user
-
+            context['api_url_upload'] = API_URL_UPLOAD
+            context['reset_req_url'] = API_URL_RESET
             template = loader.get_template('index.html')
             return HttpResponse(template.render(context, request))
 
