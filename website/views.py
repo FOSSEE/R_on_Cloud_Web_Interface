@@ -1,14 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import loader
 import requests
 import uuid
-from R_on_Cloud.config import (API_URL_UPLOAD)
+from R_on_Cloud.config import (API_URL_UPLOAD, API_URL_RESET, AUTH_KEY)
 from website.models import *
 from django.db.models import Q
 import json as simplejson
 from . import utils
 from django.db import connections
+from collections import defaultdict
 from .query import *
 
 
@@ -21,31 +22,18 @@ def dictfetchall(cursor):
     ]
 
 
-def catg(cat_id, all_cat):
-    if all_cat is False:
-        category = TextbookCompanionCategoryList.objects.using('r')\
-            .get(category_id=cat_id)
-        return category.maincategory
-    else:
-        category = TextbookCompanionCategoryList.objects.using('r')\
-            .filter(~Q(category_id=0)).order_by('maincategory')
-        return category
-
-
-def subcatg(subcat_id, all_subcat):
-    if all_subcat is False:
-        category = TextbookCompanionSubCategoryList.objects.using('r')\
-            .get(id=subcat_id)
-        return category.subcategory
-    else:
-        category = TextbookCompanionSubCategoryList.objects.using('r')\
-            .all().order_by('subcategory')
-        return category
+def catg():
+    with connections['r'].cursor() as cursor:
+        cursor.execute(GET_ALLMAINCATEGORY_SQL)
+        category = dictfetchall(cursor)
+    return category
 
 
 def get_subcategories(maincat_id):
-    subcategories = TextbookCompanionSubCategoryList.objects.using('r')\
-        .filter(maincategory_id=maincat_id).order_by('subcategory_id')
+    with connections['r'].cursor() as cursor:
+        cursor.execute(GET_SUBCATEGORY_SQL,
+                       params=[maincat_id])
+        subcategories = dictfetchall(cursor)
     return subcategories
 
 
@@ -97,19 +85,12 @@ def index(request):
     context['reset_req_url'] = API_URL_RESET
     book_id = request.GET.get('book_id')
     user = request.user
-    if 'user_id' in request.session:
-        context['user_id'] = request.session['user_id']
-    else:
-        context['user_id'] = str(user_id)
+    if not 'user_id' in request.session:
         request.session['user_id'] = str(user_id)
 
     if not (request.GET.get('eid') or request.GET.get('book_id')):
-        catg_all = catg(None, all_cat=True)
-        subcatg_all = subcatg(None, all_subcat=True)
-        context = {
-            'catg': catg_all,
-            'subcatg': subcatg_all,
-        }
+        catg_all = catg()
+
         if 'maincat_id' in request.session:
             maincat_id = request.session['maincat_id']
             context['maincat_id'] = int(maincat_id)
@@ -154,9 +135,12 @@ def index(request):
                 session_code = get_code(
                     request.session['filepath'], commit_sha)
                 context['code'] = session_code
-        context['user_id'] = request.session['user_id']
-        context['reset_req_url'] = API_URL_RESET
-
+        context = {
+            'catg': catg_all,
+            'api_url_upload': API_URL_UPLOAD,
+            'user_id': request.session['user_id'],
+            'key': AUTH_KEY,
+        }
         template = loader.get_template('index.html')
         return HttpResponse(template.render(context, request))
     elif book_id:
@@ -355,4 +339,22 @@ def update_view_count(request):
         Example_views_count = cursor.fetchone()
     data = Example_views_count[0]
     return HttpResponse(simplejson.dumps(data),
+                        content_type='application/json')
+
+
+def reset(request):
+    try:
+        for key, value in list(request.session.items()):
+
+            if key != 'user_id':
+                del request.session[key]
+            print('{} => {}'.format(key, value))
+            print("done----")
+            response = {"data" : "ok"}
+            return HttpResponse(simplejson.dumps(response),
+                        content_type='application/json')
+    except KeyError:
+        pass
+    response = {"data" : "ok"}
+    return HttpResponse(simplejson.dumps(response),
                         content_type='application/json')

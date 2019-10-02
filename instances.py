@@ -50,8 +50,8 @@ def execute_code(code, user_id, R_file_id):
         os.makedirs(TEMP_DIR)
     result = requests.post(API_URL, json=jsondata, headers=headers)
     output = result.json()
-    output_auth_error = json.loads(json.dumps(output['auth_error']))
-    if output_auth_error != '400':
+    output_status = json.loads(json.dumps(output['status']))
+    if output_status != '400':
         output_data = json.loads(json.dumps(output['data']))
         output_error = json.loads(json.dumps(output['error']))
         plot_exist = json.loads(json.dumps(output['is_plot']))
@@ -64,7 +64,9 @@ def execute_code(code, user_id, R_file_id):
             'plot_path': plot_path_req,
         }
     else:
-        data = {'error': "Invalid request, please try after some time"}
+        data = {'error': "Invalid request, please try after some time {0}"
+                .format(output_status)
+                }
     return data
 
 

@@ -1,7 +1,19 @@
+GET_ALLMAINCATEGORY_SQL = """
+                SELECT category_id, maincategory
+                FROM list_of_category ORDER BY maincategory ASC
+                """
+GET_ALLSUBCATEGORY_SQL = """
+                SELECT id, subcategory_id, subcategory, maincategory_id
+                FROM list_of_subcategory ORDER BY subcategory ASC
+                """
+
 GET_SUBCATEGORY_SQL = """
                 SELECT id, subcategory_id, subcategory, maincategory_id
                 FROM list_of_subcategory WHERE maincategory_id =%s
+                ORDER BY subcategory ASC
                 """
+
+
 
 
 GET_TBC_PREFERENCE_SQL = """
@@ -18,6 +30,7 @@ GET_TBC_PREFERENCE_SQL = """
                 WHERE po.proposal_status = 3 AND pe.approval_status = 1
                 AND pe.id = tcbm.pref_id AND pe.cloud_pref_err_status = 0
                 AND loc.category_id = %s AND tcbm.sub_category = %s
+                ORDER BY pe.book ASC
                 """
 
 

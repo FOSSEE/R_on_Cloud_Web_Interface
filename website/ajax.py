@@ -192,13 +192,13 @@ def code(request):
         if not example_id:
             example_id = int(request.GET.get('example_id'))
         file_path = request.session['filepath']
-        #review = ScilabCloudComment.objects.using('r')\
+        #review = R_CloudComment.objects.using('r')\
         #    .filter(example=example_id).count()
         review = 0
         with connections['r'].cursor() as cursor:
             cursor.execute(GET_TBC_EXAMPLE_VIEW_SQL, params=[example_id])
             exmple = cursor.fetchone()
-        review_url = "https://scilab.in/cloud_comments/" + str(example_id)
+        review_url = "https://r.fossee.in/cloud_comments/" + str(example_id)
 
         file = utils.get_file(file_path, commit_sha, main_repo=True)
         code = file
@@ -310,15 +310,15 @@ def bug_form_submit(request):
                 'example_no': example_number,
                 'comment': comment,
             }
-            scilab_comment = ScilabCloudComment()
-            scilab_comment.type = error_int
-            scilab_comment.comment = comment
-            scilab_comment.email = email
-            scilab_comment.category = comment_data[0].category
-            scilab_comment.books = book_id
-            scilab_comment.chapter = chapter_id
-            scilab_comment.example = ex_id
-            scilab_comment.save(using='r')
+            r_comment = R_CloudComment()
+            r_comment.type = error_int
+            r_comment.comment = comment
+            r_comment.email = email
+            r_comment.category = comment_data[0].category
+            r_comment.books = book_id
+            r_comment.chapter = chapter_id
+            r_comment.example = ex_id
+            r_comment.save(using='r')
             subject = "New Cloud Comment"
             message = render_to_string('email.html', context)
             from_email = FROM_EMAIL

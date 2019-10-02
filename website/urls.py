@@ -17,4 +17,5 @@ urlpatterns = [
     path('update_view_count/', views.update_view_count,
         name='update_view_count'),
     path('get_contributor/', ajax.contributor, name='contributor'),
+    path('reset/', views.reset, name='reset'),
     ]

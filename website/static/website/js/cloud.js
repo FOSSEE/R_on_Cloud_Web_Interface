@@ -136,6 +136,7 @@ $(document.body).ready(function() {
     $("#diff-wrapper").hide();
     $("#databox-wrapper").hide();
     if ($("#main_categories").val() == 0) {
+        $('#main_categories').prop('selectedIndex',0);
         $("#category-wrapper").hide();
         $("#books-wrapper").hide();
         $("#chapters-wrapper").hide();
@@ -145,6 +146,35 @@ $(document.body).ready(function() {
         $("#diff-wrapper").hide();
         $("#contributor").hide();
         $("#databox-wrapper").hide();
+    }else{
+        $.ajax({
+            url: 'get_subcategories/',
+            dataType: 'JSON',
+            type: 'GET',
+            data: {
+                maincat_id: $("#main_categories").val(),
+            },
+            success: function(data) {
+                ajax_loader("clear");
+                $("#categories").html(
+                    '');
+                $("#categories").html(
+                    ' <option value="">Select Subcategory</option>'
+                );
+                var j = 1;
+                for (var i = 0; i <
+                    data.length; i++) {
+                    $('#categories').append(
+                        '<option value="' +
+                        data[i].subcategory_id +
+                        '">' + j + ' - ' +
+                        data[i].subcategory +
+                        '</option>'
+                    );
+                    j++;
+                }
+            }
+        });
     }
     if ($("#categories").val() == 0) {
         $("#books-wrapper").hide();
@@ -335,8 +365,6 @@ $(document.body).ready(function() {
         var book_id = $('#books').find(":selected").val();
         ajax_loader(this);
         $("#chapters-wrapper").show();
-        console.log(book_id);
-
         if (book_id != 0) {
             $("#download-book").show();
             $("#contributor").show();
@@ -404,7 +432,6 @@ $(document.body).ready(function() {
         var chapter_id = $('#chapters').find(
             ":selected").val();
         $("#examples-wrapper").show();
-        console.log(chapter_id);
         if (chapter_id != 0) {
             $("#examples-wrapper").show();
             $("#download-chapter").show();
@@ -474,7 +501,6 @@ $(document.body).ready(function() {
             $("#databox-wrapper").hide();
             editor.setValue("");
             result.setValue("");
-            console.log(example_id);
             ajax_loader('#revisions');
             $.ajax({
                 url: 'get_revisions/',
@@ -797,7 +823,6 @@ $(document.body).ready(function() {
         issue_id = $("#id_issue").val();
         id_description_wrapper = $.trim($("#id_description").val());
         id_email = $.trim($("#id_email").val());
-        console.log(id_description_wrapper.length);
         if (issue_id == 0 || id_description_wrapper.length == 0 || id_email.length == 0) {
             if (issue_id == 0) {
                 $('#id_issue').css({
@@ -838,7 +863,6 @@ $(document.body).ready(function() {
                     email: id_email,
                 },
                 success: function(data) {
-                    console.log(data);
                     alert(data);
                     ajax_loader("clear");
                     $("#bug_form_wrapper").modal('toggle');
@@ -981,7 +1005,6 @@ $(document.body).ready(function() {
                     search_string: search_string,
                 },
                 success: function(data) {
-                    console.log(data);
                     $("#popular").html('<h2>Popular</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#popular").append(
@@ -999,7 +1022,6 @@ $(document.body).ready(function() {
                     search_string: search_string,
                 },
                 success: function(data) {
-                    console.log(data);
                     $("#recent").html('<h2>Recent</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#recent").append(
@@ -1030,12 +1052,20 @@ $(document.body).ready(function() {
     });
 
     $(document).on("click", "#reset", function() {
-        if(confirm("Are you sure you want to reset? Reset will clear of your data/uploaded file.")){
-            document.location.reload(true);
-        }
-        else{
-            return false;
-        }
+         $.ajax({
+                url : "reset/",
+                dataType: 'JSON',
+                type: 'GET',
+                data:{ reset: '1' },
+                
+                success : function (data) {
+                    document.location.reload(true);
+                },
+                beforeSend:function(){
+                     return confirm("Are you sure you want to reset? Reset will clear of your data/uploaded file.");
+                },
+            });
+
     });
 
 }); //document.readOnly()
@@ -1048,10 +1078,11 @@ function doSubmit(){
         var file = fileSelect.files[0]
         formData.set("file", file , file.name);
         var user_id = document.getElementById("user_id");
-    formData.set("user_id", user_id.value)
-    // Http Request
+        formData.set("user_id", user_id.value);
+        formData.set("X-Api-Key", key);
 
     var request = new XMLHttpRequest();
+
     request.open('POST', api_url_upload);
     request.send(formData);
     return (fileSelect.files[0].name);

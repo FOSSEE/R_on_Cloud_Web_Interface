@@ -2,6 +2,16 @@ from django.db import models
 
 # Create your models here.
 
+class Banner(models.Model):
+    title = models.CharField(max_length=500)
+    banner = models.TextField(max_length=1000)
+    position = models.IntegerField()
+    visible = models.BooleanField()
+
+    def __str__(self):
+        return self.banner
+
+
 class TextbookCompanionCategoryList(models.Model):
     id = models.IntegerField(unique=True, primary_key=True)
     category_name = models.CharField(max_length=100)
