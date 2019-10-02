@@ -87,6 +87,7 @@ $(document.body).ready(function() {
     $toggle_code = $("#toggle-code");
 
     $fullscreen_code.click(function(e) {
+        alert("Press escape to exit from fullScreen mode");
         editor.setOption("fullScreen", !editor.getOption(
             "fullScreen"));
         editor.focus();
@@ -106,6 +107,7 @@ $(document.body).ready(function() {
     $toggle_result = $("#toggle-result");
 
     $fullscreen_result.click(function(e) {
+        alert("Press escape to exit from fullScreen mode");
         result.setOption("fullScreen", !result.getOption(
             "fullScreen"));
         result.focus();
@@ -134,6 +136,7 @@ $(document.body).ready(function() {
     $("#diff-wrapper").hide();
     $("#databox-wrapper").hide();
     if ($("#main_categories").val() == 0) {
+        $('#main_categories').prop('selectedIndex',0);
         $("#category-wrapper").hide();
         $("#books-wrapper").hide();
         $("#chapters-wrapper").hide();
@@ -143,6 +146,35 @@ $(document.body).ready(function() {
         $("#diff-wrapper").hide();
         $("#contributor").hide();
         $("#databox-wrapper").hide();
+    }else{
+        $.ajax({
+            url: 'get_subcategories/',
+            dataType: 'JSON',
+            type: 'GET',
+            data: {
+                maincat_id: $("#main_categories").val(),
+            },
+            success: function(data) {
+                ajax_loader("clear");
+                $("#categories").html(
+                    '');
+                $("#categories").html(
+                    ' <option value="">Select Subcategory</option>'
+                );
+                var j = 1;
+                for (var i = 0; i <
+                    data.length; i++) {
+                    $('#categories').append(
+                        '<option value="' +
+                        data[i].subcategory_id +
+                        '">' + j + ' - ' +
+                        data[i].subcategory +
+                        '</option>'
+                    );
+                    j++;
+                }
+            }
+        });
     }
     if ($("#categories").val() == 0) {
         $("#books-wrapper").hide();
@@ -333,8 +365,6 @@ $(document.body).ready(function() {
         var book_id = $('#books').find(":selected").val();
         ajax_loader(this);
         $("#chapters-wrapper").show();
-        console.log(book_id);
-
         if (book_id != 0) {
             $("#download-book").show();
             $("#contributor").show();
@@ -402,7 +432,6 @@ $(document.body).ready(function() {
         var chapter_id = $('#chapters').find(
             ":selected").val();
         $("#examples-wrapper").show();
-        console.log(chapter_id);
         if (chapter_id != 0) {
             $("#examples-wrapper").show();
             $("#download-chapter").show();
@@ -489,8 +518,8 @@ $(document.body).ready(function() {
                         data: {
                             ex_id: ex_id,
                         },
-                        success: function(data) {
-                            $("#example_views_count").text(data);
+                        success: function(data1) {
+                            $("#example_views_count").text(data1);
                         }
                     });
                     $("#revisions").html(
@@ -498,30 +527,30 @@ $(document.body).ready(function() {
                     );
 
                     var i = 1;
-                    data.forEach(
-                        function(
-                            item) {
-                            $('#revisions').append(
-                                '<option value="' + item.commit_sha + '"> ' +
-                                i + ' - ' + item.commit_message +
+                    $.each(data, function(key, value){
+                        $.each(value, function(key, value){
+                        $('#revisions').append(
+                                '<option value="' + value[1] + '"> ' +
+                                i + ' - ' + value[0]+
                                 '</option>'
-                            );
-                            i++;
+                        );
+                        i++;
                         });
+                    });
                     $("#revisions-diff").html(
                         ' <option value="">Select a revision</option>'
                     );
                     var i = 1;
-                    data.forEach(
-                        function(
-                            item) {
-                            $('#revisions-diff').append(
-                                '<option value="' + item.commit_sha + '"> ' +
-                                i + ' - ' + item.commit_message +
+                    $.each(data, function(key, value){
+                        $.each(value, function(key, value){
+                        $('#revisions-diff').append(
+                                '<option value="' + value[1] + '"> ' +
+                                i + ' - ' + value[0]+
                                 '</option>'
-                            );
-                            i++;
+                        );
+                        i++;
                         });
+                    });
                     $(
                         '#revisions option:eq(1)'
                     ).prop(
@@ -544,8 +573,7 @@ $(document.body).ready(function() {
                                 $("#review").hide();
                             }
                             $("#example_views_count").text(data.exmple);
-                            editor.setValue("clear; // Remove clear, clc from code if you want to access existing stored variable from the memory" +
-                                "\n" + "\n" + data.code);
+                            editor.setValue(data.code);
                             initial_code = editor.getValue();
                             ajax_loader("clear");
                         }
@@ -659,7 +687,7 @@ $(document.body).ready(function() {
             token: $(
                 "[name='csrfmiddlewaretoken']"
             ).val(),
-            session_id: $("#session_id").val() || 0,
+            user_id: $("#user_id").val() || 0,
             R_file_id: $("#R_file_id").val() || 0,
             code: editor.getValue(),
             book_id: $("#books").val() || 0,
@@ -672,26 +700,29 @@ $(document.body).ready(function() {
                 $("#execute-inner").html(
                     "Execute");
                 ajax_loader('clear');
-                result.setValue(data.output);
-                if(data.graph_exist){
-                            $plot = $("<img>");
-                            $plot.attr({
-                                src: data.graph_path,
-                                width: '100%'
-                            });
-                            $plotbox.html($plot);
-                            $plotbox_wrapper.modal('show');
-                            var dt = $(
-                                    "#examples option:selected"
-                                )
-                                .text();
-                            $("#plot_download").show();
-                            $("#plot_download").attr(
-                                "download", dt +
-                                '.png');
-                            $("#plot_download").attr(
-                                "href", data.graph_path
-                            );
+                if (data.error.length != 0)
+                {
+                    alert(data.error);
+                }
+                else{
+                    result.setValue(data.output);
+                    if(data.plot_exist =='True'){
+                                $plot = $("<img>");
+                                $plot.attr({
+                                    src: data.plot_path,
+                                    width: '100%'
+                                });
+                                $plotbox.html($plot);
+                                $plotbox_wrapper.modal('show');
+                                var dt = new Date().getTime();
+                                $("#plot_download").show();
+                                $("#plot_download").attr(
+                                    "download", dt +
+                                    '.png');
+                                $("#plot_download").attr(
+                                    "href", data.plot_path
+                                );
+                    }
                 }
             });
         }else{
@@ -704,21 +735,21 @@ $(document.body).ready(function() {
     /********************************************/
     $(document).on("click", "#download-book", function(e) {
         window.location =
-            "http://r.fossee.in/download/book/" + $(
+            "http://r.fossee.in/textbook-companion/download/book/" + $(
                 "#books").val();
         e.preventDefault();
     });
 
     $(document).on("click", "#download-chapter", function(e) {
         window.location =
-            "http://r.fossee.in/download/chapter/" +
+            "http://r.fossee.in/textbook-companion/download/chapter/" +
             $("#chapters").val();
         e.preventDefault();
     });
 
     $(document).on("click", "#download-example", function(e) {
         window.location =
-            "http://r.fossee.in/download/example/" +
+            "http://r.fossee.in/textbook-companion/download/example/" +
             $("#examples").val();
         e.preventDefault();
     });
@@ -754,7 +785,9 @@ $(document.body).ready(function() {
     /****** Bug form handling *******************/
     /********************************************/
     $(document).on("click", "#bug", function(e) {
-
+        alert("This form is under development");
+        $("#bug_form_wrapper").modal('hide');
+        return false;
         $.ajax({
             url: 'get_bug_form/',
             dataType: 'JSON',
@@ -790,7 +823,6 @@ $(document.body).ready(function() {
         issue_id = $("#id_issue").val();
         id_description_wrapper = $.trim($("#id_description").val());
         id_email = $.trim($("#id_email").val());
-        console.log(id_description_wrapper.length);
         if (issue_id == 0 || id_description_wrapper.length == 0 || id_email.length == 0) {
             if (issue_id == 0) {
                 $('#id_issue').css({
@@ -831,7 +863,6 @@ $(document.body).ready(function() {
                     email: id_email,
                 },
                 success: function(data) {
-                    console.log(data);
                     alert(data);
                     ajax_loader("clear");
                     $("#bug_form_wrapper").modal('toggle');
@@ -974,7 +1005,6 @@ $(document.body).ready(function() {
                     search_string: search_string,
                 },
                 success: function(data) {
-                    console.log(data);
                     $("#popular").html('<h2>Popular</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#popular").append(
@@ -992,7 +1022,6 @@ $(document.body).ready(function() {
                     search_string: search_string,
                 },
                 success: function(data) {
-                    console.log(data);
                     $("#recent").html('<h2>Recent</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#recent").append(
@@ -1023,12 +1052,20 @@ $(document.body).ready(function() {
     });
 
     $(document).on("click", "#reset", function() {
-        if(confirm("Are you sure you want to reset? Reset will clear of your data/uploaded file.")){
-            document.location.reload(true);
-        }
-        else{
-            return false;
-        }
+         $.ajax({
+                url : "reset/",
+                dataType: 'JSON',
+                type: 'GET',
+                data:{ reset: '1' },
+                
+                success : function (data) {
+                    document.location.reload(true);
+                },
+                beforeSend:function(){
+                     return confirm("Are you sure you want to reset? Reset will clear of your data/uploaded file.");
+                },
+            });
+
     });
 
 }); //document.readOnly()
@@ -1040,10 +1077,12 @@ function doSubmit(){
     if(fileSelect.files && fileSelect.files.length == 1){
         var file = fileSelect.files[0]
         formData.set("file", file , file.name);
-	 var session_id = document.getElementById("session_id");
-    formData.set("session_id", session_id.value)
-    // Http Request
+        var user_id = document.getElementById("user_id");
+        formData.set("user_id", user_id.value);
+        formData.set("X-Api-Key", key);
+
     var request = new XMLHttpRequest();
+
     request.open('POST', api_url_upload);
     request.send(formData);
     return (fileSelect.files[0].name);
