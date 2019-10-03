@@ -18,6 +18,7 @@
     <meta name="keywords" content="R on cloud,R online execute,R online compiler,R computation,calcul scientifique,numerical computation,R computing online,R calculator">
     <script>
         var api_url_upload = "{{ api_url_upload }}";
+        var key = "{{ key }}";
     </script>
     <script>
         if('{{ err_msg }}'){
@@ -27,6 +28,14 @@
 </head>
 
 <body>
+        <!-- START Bootstrap-Alert -->
+    <div class="alert text-center cookiealert" role="alert" style="background:#0f2342; color: #ffffff;">
+        The website is currently undergoing some developmental changes. If you encounter any glitches, write to us at <a href="mailto:contact-r@fossee.in">contact-r[at]fossee[dot]in</a>; we value your feedback and suggestions !
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" >
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <!-- END Bootstrap-Alert -->
     <nav class="navbar navbar-expand-md bg-dark navbar-dark">
         <img class="navbar-brand" src="{% static 'website/images/home-logo.png' %}" alt="logo" style="height:40px;width:30px">
         <a class="navbar-brand" href="#">R on cloud <sup><i>Beta</i></sup></a>
@@ -75,7 +84,7 @@
                 {% endif %}
                 <li class="nav-item">
                     <a href="https://r.fossee.in" target="_blank">
-                        <img class="navbar-brand" src="{% static 'website/images/r-logo.png' %}" alt="logo" style="width:100px">
+                        <img class="navbar-brand" src="{% static 'website/images/r-logo.png' %}" alt="logo" style="width:100%;height:60px;">
                     </a>
                 </li>
             </ul>
@@ -83,13 +92,13 @@
     </nav>
     <br>
     <div class="container small">
-       <!-- <form class="col-12">
+        <form class="col-12">
              <div id="main-category-wrapper" class="form-row form-group">
-                <label class="col-sm-2 col-form-label font-weight-bold">Main Category :</label>
+                <label class="col-sm-2 col-form-label font-weight-bold">{{ maincat_id }} Main Category :</label>
                 <select id="main_categories" class="form-control-sm col-sm-10">
                     <option value="0">Select Main Category</option>
-                    {% for category in catg %} {% if maincat_id == category.category_id %}
-                    <option value="{{ category.category_id }}" selected>{{ forloop.counter }} - {{ category.maincategory }}</option>
+                    {% for category in catg %} {% if maincat_id == category.category_id or maincat_id == 0 %}
+                    <option value="{{ maincat_id }}" selected>{{ forloop.counter }} - {{ category.maincategory }}</option>
                     {% else %}
                     <option value="{{ category.category_id }}">{{ forloop.counter }} - {{ category.maincategory }}</option>
                     {% endif %} {% endfor %}
@@ -109,9 +118,10 @@
                 <a href="#" class="extra-link col-sm-2" id="contributor">+Contributor</a>
             </div>
             <div id="books-wrapper" class="form-row form-group">
-                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold">Book :</label>
+                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold">Book : </label>
                 <select id="books" class="form-control-sm col-sm-8">
                     <option value="0">Select Book </option>
+
                     {% for book in books %} {% if book_id == book.id %}
                     <option value="{{ book.id }}" selected>{{ forloop.counter }} - {{ book.book }} (by {{ book.author }})</option>
                     {% else %}
@@ -168,7 +178,6 @@
                 </select>
             </div>
         </form>
-        -->
         <!-- -------------------------------------------------------------------------------------- -->
     </div> 
     <!---------- container----------------- -->
@@ -216,10 +225,10 @@
                     </div>
                     <textarea id="code" class="form-control" rows="5" placeholder="Write a new code or select existing from above category..." wrap="hard">{{ code }}</textarea>
                     <br>
-                    <input type="hidden" id="session_id" name="session_id" value="{{ session_id }}">
+                    <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
                     <a id="execute" class="btn btn-dark text-white"><span id="execute-inner">Execute</span></a>
                      <!-- Trigger the modal with a button -->
-                      <button id="uploaddataset" type="button" class="btn btn-dark text-white" data-toggle="modal" data-target="#uploaddatasetModal">Upload Dataset</button>
+                      <!-- <button id="uploaddataset" type="button" class="btn btn-dark text-white" data-toggle="modal" data-target="#uploaddatasetModal">Upload Dataset</button>  -->
                        <button id="reset" type="button" class="btn btn-dark text-white" data-dismiss="modal">Reset</button>
 
                       <!-- Modal -->
@@ -230,7 +239,9 @@
                             <div class="modal-header">
                             </div>
                             <div class="modal-body">
+                                <p>Upload your CSV dataset file</p>
                             <form>
+                                {% csrf_token %}
                               <input type="file" id="fileSelect" accept="text/csv" />
                               <button id="fileuploadsubmit" type="button" >Upload</button>
                             </form>
@@ -267,7 +278,7 @@
                     </div>
                     <textarea id="result" class="form-control" rows="5"></textarea>
                     <br>
-                    <a id="bug" href="" class="btn btn-dark text-white float-right" data-toggle="modal" data-target="#bug_form_wrapper">Report bug / Give Feedback</a>
+                   <!-- <a id="bug" href="" class="btn btn-dark text-white float-right" data-toggle="modal" data-target="#bug_form_wrapper">Report bug / Give Feedback</a> -->
                 </div>
             </div>
         </div>
@@ -616,6 +627,9 @@
     <script src="{% static 'website/js/cloud.js' %}"></script>
     <script src="{% static 'website/js/jsdiff.js'%}"></script>
     {% csrf_token %}
+
+<!-- JS for alert -->
+    <script src="{% static 'website/js/cookiealert.js'%}"></script>
 </body>
 
 </html>

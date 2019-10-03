@@ -1,9 +1,5 @@
 #!/usr/bin/env python
 
-# Run this with
-# PYTHONPATH=. DJANGO_SETTINGS_MODULE=testsite.settings
-# testsite/tornado_main.py
-
 from tornado.options import options, define, parse_command_line
 import django.core.handlers.wsgi
 import tornado.httpserver
@@ -11,11 +7,7 @@ import tornado.ioloop
 import tornado.web
 import tornado.wsgi
 import os, sys
-import json as simplejson
 import django
-
-#Gist https://gist.githubusercontent.com/wonderbeyond/d38cd85243befe863cdde54b84505784/raw/ab78419248055333a6bf4a50022311cae9d6596c/graceful_shutdown_tornado_web_server.py
-
 import time
 import signal
 import logging
@@ -122,10 +114,10 @@ class ExecutionHandler(tornado.web.RequestHandler):
     def post(self):
         global request_count
         request_count += 1
-        session_id = self.request.arguments['session_id'][0].decode('UTF-8')
+        user_id = self.request.arguments['user_id'][0]
         R_file_id = str(time.time())
-        code = self.request.arguments['code'][0].decode('UTF-8')
-        data = yield executor.submit(execute_code, code, session_id, R_file_id)
+        code = self.request.arguments['code'][0]
+        data = yield executor.submit(execute_code, code.decode("utf-8"), user_id, R_file_id)
         self.write(data)
         request_count -= 1
 
