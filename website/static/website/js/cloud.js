@@ -146,35 +146,6 @@ $(document.body).ready(function() {
         $("#diff-wrapper").hide();
         $("#contributor").hide();
         $("#databox-wrapper").hide();
-    }else{
-        $.ajax({
-            url: 'get_subcategories/',
-            dataType: 'JSON',
-            type: 'GET',
-            data: {
-                maincat_id: $("#main_categories").val(),
-            },
-            success: function(data) {
-                ajax_loader("clear");
-                $("#categories").html(
-                    '');
-                $("#categories").html(
-                    ' <option value="">Select Subcategory</option>'
-                );
-                var j = 1;
-                for (var i = 0; i <
-                    data.length; i++) {
-                    $('#categories').append(
-                        '<option value="' +
-                        data[i].subcategory_id +
-                        '">' + j + ' - ' +
-                        data[i].subcategory +
-                        '</option>'
-                    );
-                    j++;
-                }
-            }
-        });
     }
     if ($("#categories").val() == 0) {
         $("#books-wrapper").hide();
