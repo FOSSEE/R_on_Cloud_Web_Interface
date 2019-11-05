@@ -240,12 +240,24 @@ def index(request):
                                    params=[chapter_id[0]])
                     preference_id = cursor.fetchone()
                 with connections['r'].cursor() as cursor:
-                    cursor.execute(GET_TBC_PREFERENCE_DETAIL_CATEGORY_SQL,
+                    rows_count = cursor.execute(GET_TBC_PREFERENCE_DETAIL_CATEGORY_SQL,
                                    params=[preference_id[0]])
-                    books_detail = cursor.fetchone()
-                books = get_books(books_detail[1])
-                maincat_id = books_detail[0]
-                subcat_id = books_detail[1]
+                    if rows_count > 0:
+                        books_detail = cursor.fetchone()
+                        books = get_books(books_detail[1])
+                        maincat_id = books_detail[0]
+                        subcat_id = books_detail[1]
+                    else:
+                        catg_all = catg()
+                        context = {
+                            'catg': catg_all,
+                            'err_msg': """This book is not supported by R on Cloud."""
+                                    """ You are redirected to home page."""
+                        }
+                        context['api_url_upload'] = API_URL_UPLOAD
+                        context['reset_req_url'] = API_URL_RESET
+                        template = loader.get_template('index.html')
+                        return HttpResponse(template.render(context, request))
 
                 with connections['r'].cursor() as cursor:
                     cursor.execute(GET_TBC_EXAMPLE_FILE_SQL,
@@ -291,10 +303,11 @@ def index(request):
                 .order_by('subcategory_id')
             categ_all = TextbookCompanionCategoryList.objects.using('r')\
                 .filter(~Q(category_id=0)).order_by('maincategory')
-            if len(list([ex_views_count[0]])) == 0:
-                ex_views_count = 0
-            else:
-                ex_views_count = ex_views_count[0]
+            ex_views_count = 0
+            #if len(list([ex_views_count[0]])) == 0:
+            #    ex_views_count = 0
+            #else:
+            #    ex_views_count = ex_views_count[0]
             context = {
                 'catg': categ_all,
                 'subcatg': subcateg_all,
@@ -347,8 +360,6 @@ def reset(request):
         for key, value in list(request.session.items()):
             if key != 'user_id':
                 del request.session[key]
-            print('{} => {}'.format(key, value))
-            print("done----")
             response = {"data" : "ok"}
             return HttpResponse(simplejson.dumps(response),
                         content_type='application/json')
