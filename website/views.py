@@ -298,16 +298,15 @@ def index(request):
                 context['api_url_upload'] = API_URL_UPLOAD
                 template = loader.get_template('index.html')
                 return HttpResponse(template.render(context, request))
-            subcateg_all = TextbookCompanionSubCategoryList.objects\
-                .using('r').filter(maincategory_id=maincat_id)\
-                .order_by('subcategory_id')
-            categ_all = TextbookCompanionCategoryList.objects.using('r')\
-                .filter(~Q(category_id=0)).order_by('maincategory')
-            ex_views_count = 0
-            #if len(list([ex_views_count[0]])) == 0:
-            #    ex_views_count = 0
-            #else:
-            #    ex_views_count = ex_views_count[0]
+            subcateg_all = get_subcategories(maincat_id)
+            categ_all = catg()
+            if ex_views_count != None:
+                if len(list([ex_views_count[0]])) != 0:
+                    ex_views_count = ex_views_count[0]
+                else:
+                    ex_views_count = 0
+            else:
+                ex_views_count = 0
             context = {
                 'catg': categ_all,
                 'subcatg': subcateg_all,
