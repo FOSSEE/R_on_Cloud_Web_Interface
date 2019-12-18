@@ -1,3 +1,7 @@
+window.setInterval(function(){
+  checkserver();
+}, 5000);
+
 /* Ajax loader */
 function ajax_loader(key) {
     if (key == "clear") {
@@ -37,6 +41,8 @@ function checkInput(){
 }
 /**************************** math captcha function end *******************/
 $(document.body).ready(function() {
+
+    checkserver();
 
     var editor = CodeMirror.fromTextArea(document.getElementById(
         "code"), {
@@ -651,6 +657,7 @@ $(document.body).ready(function() {
     $plotbox = $("#plotbox");
 
     $(document).on("click", "#execute", function() {
+        checkserver();
         if(editor.getValue() != ""){
         ajax_loader(this);
         $("#execute-inner").html("Executing...");
@@ -1058,5 +1065,17 @@ function doSubmit(){
     request.send(formData);
     return (fileSelect.files[0].name);
     }
+}
+
+function checkserver(){
+
+    $.ajax({url: api_url,
+            dataType: "jsonp",
+            statusCode: {
+                404: function (response) {
+                    alert("Oops! R cloud server is not available, please try after some time");
+                }
+            }
+     });
 }
 

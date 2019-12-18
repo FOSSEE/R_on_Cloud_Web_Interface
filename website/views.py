@@ -3,7 +3,8 @@ from django.http import HttpResponse
 from django.template import loader
 import requests
 import uuid
-from R_on_Cloud.config import (API_URL_UPLOAD, API_URL_RESET, AUTH_KEY)
+from R_on_Cloud.config import (API_URL_UPLOAD, API_URL_RESET, AUTH_KEY,
+                               API_URL_SERVER)
 from website.models import *
 from django.db.models import Q
 import json as simplejson
@@ -83,6 +84,7 @@ def index(request):
     user_id = uuid.uuid4()
     context['api_url_upload'] = API_URL_UPLOAD
     context['reset_req_url'] = API_URL_RESET
+    context['api_url'] = API_URL_SERVER
     book_id = request.GET.get('book_id')
     user = request.user
     if not 'user_id' in request.session:
@@ -140,6 +142,7 @@ def index(request):
             'api_url_upload': API_URL_UPLOAD,
             'user_id': request.session['user_id'],
             'key': AUTH_KEY,
+            'api_url': API_URL_SERVER,
         }
         template = loader.get_template('index.html')
         return HttpResponse(template.render(context, request))
@@ -172,6 +175,7 @@ def index(request):
             }
             context['api_url_upload'] = API_URL_UPLOAD
             context['reset_req_url'] = API_URL_RESET
+            context['api_url'] = API_URL_SERVER
             template = loader.get_template('index.html')
             return HttpResponse(template.render(context, request))
 
@@ -212,6 +216,7 @@ def index(request):
             }
             context['api_url_upload'] = API_URL_UPLOAD
             context['reset_req_url'] = API_URL_RESET
+            context['api_url'] = API_URL_SERVER
             template = loader.get_template('index.html')
             return HttpResponse(template.render(context, request))
 
@@ -241,7 +246,7 @@ def index(request):
                     preference_id = cursor.fetchone()
                 with connections['r'].cursor() as cursor:
                     rows_count = cursor.execute(GET_TBC_PREFERENCE_DETAIL_CATEGORY_SQL,
-                                   params=[preference_id[0]])
+                                                params=[preference_id[0]])
                     if rows_count > 0:
                         books_detail = cursor.fetchone()
                         books = get_books(books_detail[1])
@@ -252,10 +257,11 @@ def index(request):
                         context = {
                             'catg': catg_all,
                             'err_msg': """This book is not supported by R on Cloud."""
-                                    """ You are redirected to home page."""
+                            """ You are redirected to home page."""
                         }
                         context['api_url_upload'] = API_URL_UPLOAD
                         context['reset_req_url'] = API_URL_RESET
+                        context['api_url'] = API_URL_SERVER
                         template = loader.get_template('index.html')
                         return HttpResponse(template.render(context, request))
 
@@ -296,6 +302,7 @@ def index(request):
                                """ scilab on cloud."""
                 }
                 context['api_url_upload'] = API_URL_UPLOAD
+                context['api_url'] = API_URL_SERVER
                 template = loader.get_template('index.html')
                 return HttpResponse(template.render(context, request))
             subcateg_all = get_subcategories(maincat_id)
@@ -330,6 +337,7 @@ def index(request):
             #    context['user'] = user
             context['api_url_upload'] = API_URL_UPLOAD
             context['reset_req_url'] = API_URL_RESET
+            context['api_url'] = API_URL_SERVER
             template = loader.get_template('index.html')
             return HttpResponse(template.render(context, request))
 
@@ -359,11 +367,11 @@ def reset(request):
         for key, value in list(request.session.items()):
             if key != 'user_id':
                 del request.session[key]
-            response = {"data" : "ok"}
+            response = {"data": "ok"}
             return HttpResponse(simplejson.dumps(response),
-                        content_type='application/json')
+                                content_type='application/json')
     except KeyError:
         pass
-    response = {"data" : "ok"}
+    response = {"data": "ok"}
     return HttpResponse(simplejson.dumps(response),
                         content_type='application/json')
