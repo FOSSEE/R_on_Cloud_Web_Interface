@@ -905,6 +905,21 @@ $(document.body).ready(function() {
         });
     });
     /********************************************/
+    /********************************************/
+    /********************************************/
+    /********* search feature *******************/
+    /********************************************/
+    $(document).on("change", "input[type=radio][name=optradio]", function() {
+        if (this.value == 'bybook') {
+            $("#searched_code").hide();
+            $("#searched_book").show();
+        }
+        else if (this.value == 'bycode') {
+            $("#searched_code").show();
+            $("#searched_book").hide();
+        }
+    });
+    /********************************************/
     $(document).on("click", "#search", function() {
         ajax_loader(this);
         $("#relevant").html('');
@@ -923,7 +938,7 @@ $(document.body).ready(function() {
                     $("#relevant").html('<h2>Relevant</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#relevant").append(
-                            '<a  href="?book_id=' + data[i].ids + '" class="">' + data[i].book +
+                            '<a  href="?book_id=' + data[i].id + '" class="">' + data[i].book +
                             ' (Author: ' + data[i].author + ')</a><hr>');
                    
                     }
@@ -986,7 +1001,7 @@ $(document.body).ready(function() {
                     $("#popular").html('<h2>Popular</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#popular").append(
-                            '<a  href="?book_id=' + data[i].ids + '" class="">' + data[i].book +
+                            '<a  href="?book_id=' + data[i].id + '" class="">' + data[i].book +
                             ' (Author: ' + data[i].author + ')</a><hr>');
                     }
                     ajax_loader("clear");
@@ -1003,7 +1018,7 @@ $(document.body).ready(function() {
                     $("#recent").html('<h2>Recent</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#recent").append(
-                            '<a  href="?book_id=' + data[i].ids + '" class="">' + data[i].book +
+                            '<a  href="?book_id=' + data[i].id + '" class="">' + data[i].book +
                             ' (Author: ' + data[i].author + ')</a><hr>');
                     }
                     ajax_loader("clear");

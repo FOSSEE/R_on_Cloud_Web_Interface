@@ -147,23 +147,10 @@ def index(request):
         template = loader.get_template('index.html')
         return HttpResponse(template.render(context, request))
     elif book_id:
-        books = TextbookCompanionPreference.objects\
-            .db_manager('r').raw("""
-                        SELECT DISTINCT (loc.category_id),pe.id,
-                        tcbm.sub_category,loc.maincategory, pe.book as
-                        book,loc.category_id,tcbm.sub_category,
-                        pe.author as author, pe.publisher as publisher,
-                        pe.year as year, pe.id as pe_id, pe.edition,
-                        po.approval_date as approval_date
-                        FROM textbook_companion_preference pe LEFT JOIN
-                        textbook_companion_proposal po ON pe.proposal_id = po.id
-                        LEFT JOIN textbook_companion_book_main_subcategories
-                        tcbm ON pe.id = tcbm.pref_id LEFT JOIN list_of_category
-                        loc ON tcbm.main_category = loc.category_id WHERE
-                        po.proposal_status = 3 AND pe.approval_status = 1
-                        AND pe.id = tcbm.pref_id AND
-                        pe.cloud_pref_err_status = 0 AND
-                        pe.id=%s""", [book_id])
+        with connections['r'].cursor() as cursor:
+            cursor.execute(GET_BOOK_CATEGORY_FROM_ID,
+                           params=[book_id])
+            books = cursor.fetchone()
         books = list(books)
 
         if len(books) == 0:
@@ -179,9 +166,9 @@ def index(request):
             template = loader.get_template('index.html')
             return HttpResponse(template.render(context, request))
 
-        books = get_books(books[0].sub_category)
-        maincat_id = books[0].category_id
-        subcat_id = books[0].sub_category
+        req_books = get_books(books[2])
+        maincat_id = books[0]
+        subcat_id = books[2]
         request.session['maincat_id'] = maincat_id
         request.session['subcategory_id'] = subcat_id
         request.session['book_id'] = book_id
@@ -196,8 +183,8 @@ def index(request):
             'subcatg': subcateg_all,
             'maincat_id': maincat_id,
             'chapters': chapters,
-            'subcategory_id': books[0].sub_category,
-            'books': books,
+            'subcategory_id': books[2],
+            'books': req_books,
             'book_id': int(book_id),
 
         }
@@ -375,3 +362,54 @@ def reset(request):
     response = {"data": "ok"}
     return HttpResponse(simplejson.dumps(response),
                         content_type='application/json')
+
+
+def search_book(request):
+    result = {}
+    response_dict = []
+    if request.is_ajax():
+        exact_search_string = request.GET.get('search_string')
+        search_string = "%" + exact_search_string + "%"
+        with connections['r'].cursor() as cursor:
+            cursor.execute(GET_SEARCH_BOOK_SQL, [search_string, search_string,
+                                                 str(exact_search_string),
+                                                 str(exact_search_string)])
+            result = dictfetchall(cursor)
+    return HttpResponse(simplejson.dumps(result),
+                        content_type='application/json')
+
+
+def popular(request):
+    result = {}
+    response_dict = []
+    if request.is_ajax():
+        search_string = request.GET.get('search_string')
+        search_string = "%" + search_string + "%"
+        with connections['r'].cursor() as cursor:
+            cursor.execute(GET_SEARCH_POPULAR_BOOK_SQL)
+            result = dictfetchall(cursor)
+    return HttpResponse(simplejson.dumps(result),
+                        content_type='application/json')
+
+
+def recent(request):
+    result = {}
+    response_dict = []
+    if request.is_ajax():
+        exact_search_string = request.GET.get('search_string')
+        search_string = "%" + exact_search_string + "%"
+        with connections['r'].cursor() as cursor:
+            cursor.execute(GET_SEARCH_RECENT_BOOK_SQL)
+            result = dictfetchall(cursor)
+    return HttpResponse(simplejson.dumps(result),
+                        content_type='application/json')
+
+
+def update_pref_hits(pref_id):
+    updatecount = TextbookCompanionPreferenceHits.objects.using('r')\
+        .filter(pref_id=pref_id)\
+        .update(hitcount=F('hitcount') + 1)
+    if not updatecount:
+        insertcount = TextbookCompanionPreferenceHits.objects.using('r')\
+            .get_or_create(pref_id=pref_id, hitcount=1)
+    return
