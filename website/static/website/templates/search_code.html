@@ -1,0 +1,28 @@
+<span class="badge badge-info">Search results count {{ data|length }}</span>
+<div id="searched_code_data" class="col-12 bg-light text-success" style="word-wrap: break-word;overflow:auto;">
+
+{% for result in data %}
+<div><span class="badge badge-info">{{ forloop.counter }}</span>
+    <i class="fa fa-book" aria-hidden="true"></i>
+    Book: <span class="text-info">{{ result.book }}</span></div>
+<div><i class="fa fa-file" aria-hidden="true"></i>
+    Chapter: <span class="text-info">{{result.chapter.0 }}</span></div>
+<div><i class="fa fa-bars" aria-hidden="true"></i>
+    Example: <span class="text-info">{{ result.example.0 }}</span></div>
+<div><i class="fa fa-external-link" aria-hidden="true"></i>
+    Links: <span class="text-success">
+    <a href="https://r.fossee.in/textbook-companion/download/book/{{ result.book_id.0 }}" target="_blank">Download book 
+        <i class="fa fa-download" aria-hidden="true"></i>
+    </a>
+    </span> <i class="fa fa-expand" aria-hidden="true"></i>
+
+    <span class="text-success">
+        <a href="http://rcloud.fossee.in/index?eid={{ result.example_id }}" target="_blank"> View this example 
+            <i class="fa fa-cloud" aria-hidden="true"></i>
+        </a>
+    </span>
+</div>
+<hr>
+{% endfor %}
+
+</div>

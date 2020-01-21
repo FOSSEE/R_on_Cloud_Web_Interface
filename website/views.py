@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.template import loader
+from django.http import HttpResponse, JsonResponse
+from django.template import loader, Context, Template
 import requests
 import uuid
 from R_on_Cloud.config import (API_URL_UPLOAD, API_URL_RESET, AUTH_KEY,
-                               API_URL_SERVER)
+                               API_URL_SERVER, URL)
 from website.models import *
 from django.db.models import Q
 import json as simplejson
@@ -12,6 +12,8 @@ from . import utils
 from django.db import connections
 from collections import defaultdict
 from .query import *
+import pysolr
+import json
 
 
 def dictfetchall(cursor):
@@ -147,23 +149,10 @@ def index(request):
         template = loader.get_template('index.html')
         return HttpResponse(template.render(context, request))
     elif book_id:
-        books = TextbookCompanionPreference.objects\
-            .db_manager('r').raw("""
-                        SELECT DISTINCT (loc.category_id),pe.id,
-                        tcbm.sub_category,loc.maincategory, pe.book as
-                        book,loc.category_id,tcbm.sub_category,
-                        pe.author as author, pe.publisher as publisher,
-                        pe.year as year, pe.id as pe_id, pe.edition,
-                        po.approval_date as approval_date
-                        FROM textbook_companion_preference pe LEFT JOIN
-                        textbook_companion_proposal po ON pe.proposal_id = po.id
-                        LEFT JOIN textbook_companion_book_main_subcategories
-                        tcbm ON pe.id = tcbm.pref_id LEFT JOIN list_of_category
-                        loc ON tcbm.main_category = loc.category_id WHERE
-                        po.proposal_status = 3 AND pe.approval_status = 1
-                        AND pe.id = tcbm.pref_id AND
-                        pe.cloud_pref_err_status = 0 AND
-                        pe.id=%s""", [book_id])
+        with connections['r'].cursor() as cursor:
+            cursor.execute(GET_BOOK_CATEGORY_FROM_ID,
+                           params=[book_id])
+            books = cursor.fetchone()
         books = list(books)
 
         if len(books) == 0:
@@ -179,9 +168,9 @@ def index(request):
             template = loader.get_template('index.html')
             return HttpResponse(template.render(context, request))
 
-        books = get_books(books[0].sub_category)
-        maincat_id = books[0].category_id
-        subcat_id = books[0].sub_category
+        req_books = get_books(books[2])
+        maincat_id = books[0]
+        subcat_id = books[2]
         request.session['maincat_id'] = maincat_id
         request.session['subcategory_id'] = subcat_id
         request.session['book_id'] = book_id
@@ -196,8 +185,8 @@ def index(request):
             'subcatg': subcateg_all,
             'maincat_id': maincat_id,
             'chapters': chapters,
-            'subcategory_id': books[0].sub_category,
-            'books': books,
+            'subcategory_id': books[2],
+            'books': req_books,
             'book_id': int(book_id),
 
         }
@@ -375,3 +364,107 @@ def reset(request):
     response = {"data": "ok"}
     return HttpResponse(simplejson.dumps(response),
                         content_type='application/json')
+
+
+def search_book(request):
+    result = {}
+    response_dict = []
+    if request.is_ajax():
+        exact_search_string = request.GET.get('search_string')
+        search_string = "%" + exact_search_string + "%"
+        with connections['r'].cursor() as cursor:
+            cursor.execute(GET_SEARCH_BOOK_SQL, [search_string, search_string,
+                                                 str(exact_search_string),
+                                                 str(exact_search_string)])
+            result = dictfetchall(cursor)
+    return HttpResponse(simplejson.dumps(result),
+                        content_type='application/json')
+
+
+def popular(request):
+    result = {}
+    response_dict = []
+    if request.is_ajax():
+        search_string = request.GET.get('search_string')
+        search_string = "%" + search_string + "%"
+        with connections['r'].cursor() as cursor:
+            cursor.execute(GET_SEARCH_POPULAR_BOOK_SQL)
+            result = dictfetchall(cursor)
+    return HttpResponse(simplejson.dumps(result),
+                        content_type='application/json')
+
+
+def recent(request):
+    result = {}
+    response_dict = []
+    if request.is_ajax():
+        exact_search_string = request.GET.get('search_string')
+        search_string = "%" + exact_search_string + "%"
+        with connections['r'].cursor() as cursor:
+            cursor.execute(GET_SEARCH_RECENT_BOOK_SQL)
+            result = dictfetchall(cursor)
+    return HttpResponse(simplejson.dumps(result),
+                        content_type='application/json')
+
+
+def update_pref_hits(pref_id):
+    updatecount = TextbookCompanionPreferenceHits.objects.using('r')\
+        .filter(pref_id=pref_id)\
+        .update(hitcount=F('hitcount') + 1)
+    if not updatecount:
+        insertcount = TextbookCompanionPreferenceHits.objects.using('r')\
+            .get_or_create(pref_id=pref_id, hitcount=1)
+    return
+
+
+def solr_search_string(request):
+
+    try:
+        requests.get(URL)
+        results = {}
+        context = []
+        response_dict = []
+        search_string = request.GET.get('search_string')
+        q = "content:'{0}'".format(search_string)
+        fl = "*"
+        qt = "select"
+        fq = "*"
+        rows = "100"
+        wt = 'json'
+        solr = pysolr.Solr(URL, search_handler="/"+qt, timeout=5)
+        results = solr.search(q, **{
+            'rows': rows,
+            'group': 'true',
+            'group.field': 'example',
+            'group.limit': '1',
+            'group.main': 'true',
+        })
+        for obj in results:
+            response = {
+                'example_id': obj['id'],
+                'book_id': obj['book_id'],
+                'book': obj['title'],
+                'author': obj['author'],
+                'chapter': obj['chapter'],
+                'example': obj['example'],
+            }
+            response_dict.append(response)
+
+        print("Saw {0} result(s).".format(len(results)))
+        template = loader.get_template('search_code.html')
+        context = {'data': response_dict}
+        data = template.render(context)
+        return JsonResponse({'data': data})
+    except Exception:
+        context = {'data': ''}
+        template = loader.get_template('search_code.html')
+        data = template.render(context)
+        return JsonResponse({'data': '', 'error': 'True'})
+
+
+def checkserver(request):
+    try:
+        req_status = requests.get(API_URL_SERVER)
+        return JsonResponse({'status': req_status.status_code})
+    except Exception:
+        return JsonResponse({'error': 'True'})
