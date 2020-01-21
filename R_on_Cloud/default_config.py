@@ -46,3 +46,10 @@ TORNADO_PORT = '8000'
 # class ExecutionHandler.
 DEFAULT_TORNADO_WORKERS = 1
 DEFAULT_REQUEST_COUNT = 1
+
+# Solr search engine config
+
+HOST       = "localhost"
+PORT       = "8983"
+COLLECTION = "r_code_search_collection"
+URL = 'http://' + HOST + ':' + PORT + '/solr/' + COLLECTION
