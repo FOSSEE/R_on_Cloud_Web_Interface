@@ -922,8 +922,10 @@ $(document.body).ready(function() {
     /********************************************/
     $(document).on("click", "#search", function() {
         ajax_loader(this);
-        $("#relevant").html('');
         var search_string = jQuery.trim($("#search-input").val());
+        if(search_string != ''){
+        if($("input[name='optradio']:checked").val() == 'bybook'){
+        $("#relevant").html('');
         if (search_string == '') {
             search_string = 'Null';
         }
@@ -935,12 +937,16 @@ $(document.body).ready(function() {
                     search_string: search_string,
                 },
                 success: function(data) {
+                    if(data.length > 0 ){
                     $("#relevant").html('<h2>Relevant</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#relevant").append(
                             '<a  href="?book_id=' + data[i].id + '" class="">' + data[i].book +
                             ' (Author: ' + data[i].author + ')</a><hr>');
                    
+                    }
+                    }else{
+                    $("#relevant").append('Oops! This book is not availabe!');
                     }
                     ajax_loader("clear");
                 }
@@ -961,7 +967,6 @@ $(document.body).ready(function() {
                     }
                     ajax_loader("clear");
                 }
-                
             }),
             $.ajax({
                 url: 'search_book/recent/',
@@ -977,9 +982,33 @@ $(document.body).ready(function() {
                             '<a  href="?book_id=' + data[i].ids + '" class="">' + data[i].book +
                             ' (Author: ' + data[i].author + ')</a><hr>');
                     }
-                    ajax_loader("clear");
                 }
             });
+            } else{
+                ajax_loader(this);
+                 $.ajax({
+                    url: 'search_in_code/',
+                    dataType: 'JSON',
+                    type: 'GET',
+                    data: {
+                        search_string: search_string,
+                    },
+                    success: function(data) {
+                    if(data.error != 'True'){
+                         console.log(data.data);
+                         $("#searched_code_data").html("");
+                         $("#searched_code").html(data.data);
+                    }else{
+                         alert("Oops! Search engine is away, please try after some time!")
+                        }
+                    }
+                });
+                ajax_loader("clear");
+            }
+            }else{
+                alert("Please enter the search string!");
+            }
+                ajax_loader("clear");
     });
 
     $(document).on("click", "#search_book", function(e) {
@@ -1083,14 +1112,14 @@ function doSubmit(){
 }
 
 function checkserver(){
-
-    $.ajax({url: api_url,
-            dataType: "jsonp",
-            statusCode: {
-                404: function (response) {
-                    alert("Oops! R cloud server is not available, please try after some time");
-                }
-            }
+    $.ajax({url: 'check_server/',
+            dataType: "json",
+            success : function (data) {
+                if((data.status == 200) || (data.error != 'True')){
+                }else{
+                        alert("R cloud server is not available, please try after some time");
+                    }
+               }
      });
 }
 

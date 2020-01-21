@@ -46,7 +46,7 @@
             <ul class="navbar-nav ml-auto">
                 {% if user and not user.is_anonymous %} {% if not user.is_staff %}
                <li class="nav-item">
-                    <a class="nav-link" href="" id="search_book" data-toggle="modal" data-target="#search_wrapper">Search Book</a>
+                    <a class="nav-link" href="" id="search_book" data-toggle="modal" data-target="#search_wrapper"><i class="fa fa-search" aria-hidden="true"></i>Search Book</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="" id="about-us" data-toggle="modal" data-target="#about_wrapper">About</a>
@@ -70,7 +70,7 @@
                 </li>
                 {% else %}
                <li class="nav-item">
-                    <a class="nav-link" href="" id="search_book" data-toggle="modal" data-target="#search_wrapper">Search</a>
+                    <a class="nav-link" href="" id="search_book" data-toggle="modal" data-target="#search_wrapper"><i class="fa fa-search text-primary" aria-hidden="true"></i>Search</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="" id="about-us" data-toggle="modal" data-target="#about_wrapper">About</a>
@@ -514,8 +514,8 @@
                     </div>
 
                     <div class="custom-control custom-radio">
-                        <label class="radio-inline"><input type="radio" value="bybook" name="optradio" checked="checked"> Search by book/author name</label>
-                        <label class="radio-inline"><input type="radio" value="bycode" name="optradio"> Search by code</label>
+                        <label class="radio-inline"><input id="bybook" type="radio" value="bybook" name="optradio" checked="checked"> <i class="fa fa-search" aria-hidden="true"></i>Search by book/author name <i class="fa fa-book" aria-hidden="true"></i></label>
+                        <label class="radio-inline"><input id="bycode" type="radio" value="bycode" name="optradio"> <i class="fa fa-search" aria-hidden="true"></i>Search by code</label>
                     </div>
                 </div>
                 <div class="container">
@@ -528,12 +528,6 @@
                         </div>
                     </div>
                     <div id="searched_code" class="row">
-                        <div id="relevant" class="col-4 small">
-                        </div>
-                        <div id="popular" class="col-4 small bg-light text-primary" style="word-wrap: break-word;overflow:auto;">
-                        </div>
-                        <div id="recent" class="col-4 small bg-light text-primary" style="word-wrap: break-word;overflow:auto;">
-                        </div>
                     </div>
                 </div>
                 <!-- Modal footer -->

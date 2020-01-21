@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.template import loader
+from django.http import HttpResponse, JsonResponse
+from django.template import loader, Context, Template
 import requests
 import uuid
 from R_on_Cloud.config import (API_URL_UPLOAD, API_URL_RESET, AUTH_KEY,
-                               API_URL_SERVER)
+                               API_URL_SERVER, URL)
 from website.models import *
 from django.db.models import Q
 import json as simplejson
@@ -12,6 +12,8 @@ from . import utils
 from django.db import connections
 from collections import defaultdict
 from .query import *
+import pysolr
+import json
 
 
 def dictfetchall(cursor):
@@ -413,3 +415,56 @@ def update_pref_hits(pref_id):
         insertcount = TextbookCompanionPreferenceHits.objects.using('r')\
             .get_or_create(pref_id=pref_id, hitcount=1)
     return
+
+
+def solr_search_string(request):
+
+    try:
+        requests.get(URL)
+        results = {}
+        context = []
+        response_dict = []
+        search_string = request.GET.get('search_string')
+        q = "content:'{0}'".format(search_string)
+        fl = "*"
+        qt = "select"
+        fq = "*"
+        rows = "100"
+        wt = 'json'
+        solr = pysolr.Solr(URL, search_handler="/"+qt, timeout=5)
+        results = solr.search(q, **{
+            'rows': rows,
+            'group': 'true',
+            'group.field': 'example',
+            'group.limit': '1',
+            'group.main': 'true',
+        })
+        for obj in results:
+            response = {
+                'example_id': obj['id'],
+                'book_id': obj['book_id'],
+                'book': obj['title'],
+                'author': obj['author'],
+                'chapter': obj['chapter'],
+                'example': obj['example'],
+            }
+            response_dict.append(response)
+
+        print("Saw {0} result(s).".format(len(results)))
+        template = loader.get_template('search_code.html')
+        context = {'data': response_dict}
+        data = template.render(context)
+        return JsonResponse({'data': data})
+    except Exception:
+        context = {'data': ''}
+        template = loader.get_template('search_code.html')
+        data = template.render(context)
+        return JsonResponse({'data': '', 'error': 'True'})
+
+
+def checkserver(request):
+    try:
+        req_status = requests.get(API_URL_SERVER)
+        return JsonResponse({'status': req_status.status_code})
+    except Exception:
+        return JsonResponse({'error': 'True'})

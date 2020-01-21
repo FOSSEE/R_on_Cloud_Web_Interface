@@ -21,4 +21,6 @@ urlpatterns = [
     path('search_book/', views.search_book, name='search_book'),
     path('search_book/popular/', views.popular, name='popular'),
     path('search_book/recent/', views.recent, name='recent'),
+    path('search_in_code/', views.solr_search_string, name='solr_search_string'),
+    path('check_server/', views.checkserver, name='checkserver'),
 ]
