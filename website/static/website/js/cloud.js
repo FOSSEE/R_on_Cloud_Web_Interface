@@ -676,7 +676,7 @@ $(document.body).ready(function() {
             function(data) {
                 var exists;
                 $("#execute-inner").html(
-                    "Execute");
+                    '<i class="fa fa-play-circle" aria-hidden="true"></i> Execute <i class="fa fa-cogs" aria-hidden="true"></i>');
                 ajax_loader('clear');
                 if (data.error.length != 0)
                 {
@@ -713,21 +713,21 @@ $(document.body).ready(function() {
     /********************************************/
     $(document).on("click", "#download-book", function(e) {
         window.location =
-            "http://r.fossee.in/textbook-companion/download/book/" + $(
+            "https://r.fossee.in/textbook-companion/download/book/" + $(
                 "#books").val();
         e.preventDefault();
     });
 
     $(document).on("click", "#download-chapter", function(e) {
         window.location =
-            "http://r.fossee.in/textbook-companion/download/chapter/" +
+            "https://r.fossee.in/textbook-companion/download/chapter/" +
             $("#chapters").val();
         e.preventDefault();
     });
 
     $(document).on("click", "#download-example", function(e) {
         window.location =
-            "http://r.fossee.in/textbook-companion/download/example/" +
+            "https://r.fossee.in/textbook-companion/download/example/" +
             $("#examples").val();
         e.preventDefault();
     });
@@ -941,12 +941,12 @@ $(document.body).ready(function() {
                     $("#relevant").html('<h2>Relevant</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#relevant").append(
-                            '<a  href="?book_id=' + data[i].id + '" class="">' + data[i].book +
+                            '<a  href="?book_id=' + data[i].id + '" class=""><i class="fa fa-book" aria-hidden="true"></i>' + data[i].book +
                             ' (Author: ' + data[i].author + ')</a><hr>');
                    
                     }
                     }else{
-                    $("#relevant").append('Oops! This book is not availabe!');
+                    $("#relevant").append('<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Oops! This book is not availabe!');
                     }
                     ajax_loader("clear");
                 }
@@ -962,7 +962,7 @@ $(document.body).ready(function() {
                     $("#popular").html('<h2>Popular</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#popular").append(
-                            '<a  href="?book_id=' + data[i].ids + '" class="">' + data[i].book +
+                            '<a  href="?book_id=' + data[i].ids + '" class=""><i class="fa fa-book" aria-hidden="true"></i>' + data[i].book +
                             ' (Author: ' + data[i].author + ')</a><hr>');
                     }
                     ajax_loader("clear");
@@ -979,7 +979,7 @@ $(document.body).ready(function() {
                     $("#recent").html('<h2>Recent</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#recent").append(
-                            '<a  href="?book_id=' + data[i].ids + '" class="">' + data[i].book +
+                            '<a  href="?book_id=' + data[i].ids + '" class=""><i class="fa fa-book" aria-hidden="true"></i>' + data[i].book +
                             ' (Author: ' + data[i].author + ')</a><hr>');
                     }
                 }
@@ -1030,7 +1030,7 @@ $(document.body).ready(function() {
                     $("#popular").html('<h2>Popular</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#popular").append(
-                            '<a  href="?book_id=' + data[i].id + '" class="">' + data[i].book +
+                            '<a  href="?book_id=' + data[i].id + '" class=""><i class="fa fa-book" aria-hidden="true"></i>' + data[i].book +
                             ' (Author: ' + data[i].author + ')</a><hr>');
                     }
                     ajax_loader("clear");
@@ -1047,14 +1047,14 @@ $(document.body).ready(function() {
                     $("#recent").html('<h2>Recent</h2><hr>');
                     for (var i = 0; i < data.length; i++) {
                         $("#recent").append(
-                            '<a  href="?book_id=' + data[i].id + '" class="">' + data[i].book +
+                            '<a  href="?book_id=' + data[i].id + '" class=""><i class="fa fa-book" aria-hidden="true"></i>' + data[i].book +
                             ' (Author: ' + data[i].author + ')</a><hr>');
                     }
                     ajax_loader("clear");
                 }
             });
         e.preventDefault();
-
+    ajax_loader("clear");
     });
 
     $(document).on("click", "#fileuploadsubmit", function() {

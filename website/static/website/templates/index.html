@@ -94,7 +94,7 @@
     <div class="container small">
         <form class="col-12">
              <div id="main-category-wrapper" class="form-row form-group">
-                <label class="col-sm-2 col-form-label font-weight-bold">Main Category :</label>
+                <label class="col-sm-2 col-form-label font-weight-bold"><i class="fa fa-list-ul" aria-hidden="true"></i> Main Category :</label>
                 <select id="main_categories" class="form-control-sm col-sm-10">
                     <option value="0">Select Main Category</option>
                     {% for category in catg %} {% if maincat_id == category.category_id or maincat_id == 0 %}
@@ -106,7 +106,7 @@
             </div> 
 
             <div id="category-wrapper" class="form-row form-group">
-                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold">Sub Category :</label>
+                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold"><i class="fa fa-th-list" aria-hidden="true"></i> Sub Category :</label>
                 <select id="categories" class="form-control-sm col-sm-8">
                     <option value="0">Select Subcategory</option>
                     {% for category in subcatg %} {% if subcategory_id == category.subcategory_id %}
@@ -115,10 +115,11 @@
                     <option value="{{ category.subcategory_id }}">{{ forloop.counter }} - {{ category.subcategory }}</option>
                     {% endif %} {% endfor %}
                 </select>
-                <a href="#" class="extra-link col-sm-2" id="contributor">+Contributor</a>
+                <a href="#" class="extra-link col-sm-2" id="contributor">+Contributor <i class="fa fa-users" aria-hidden="true"></i> </a>
             </div>
             <div id="books-wrapper" class="form-row form-group">
-                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold">Book : </label>
+                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold"><i class="fa fa-book" aria-hidden="true"></i> 
+Book : </label>
                 <select id="books" class="form-control-sm col-sm-8">
                     <option value="0">Select Book </option>
 
@@ -128,10 +129,10 @@
                     <option value="{{ book.id }}">{{ forloop.counter }} - {{ book.book }} (by {{ book.author }})</option>
                     {% endif %} {% endfor %}
                 </select>
-                <a href="#" class="extra-link col-sm-2" id="download-book">Download Book</a>
+                <a href="#" class="extra-link col-sm-2" id="download-book">Download Book <i class="fa fa-download" aria-hidden="true"></i></a>
             </div>
             <div id="chapters-wrapper" class="form-row form-group">
-                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold">Chapter :</label>
+                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold"><i class="fa fa-file" aria-hidden="true"></i> Chapter :</label>
                 <select id="chapters" class="form-control-sm col-sm-8">
                     <option value="0">Select Chapter</option>
                     {% for chapter in chapters %} {% if chapter_id == chapter.id %}
@@ -140,11 +141,11 @@
                     <option value="{{ chapter.id }}">{{ chapter.number }} - {{ chapter.name }}</option>
                     {% endif %} {% endfor %}
                 </select>
-                <a href="#" class="extra-link col-sm-2" id="download-chapter">Download Chapter</a>
+                <a href="#" class="extra-link col-sm-2" id="download-chapter">Download Chapter <i class="fa fa-download" aria-hidden="true"></i></a>
             </div>
             <div id="examples-wrapper" class="form-row form-group">
 
-                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold">Example :</label>
+                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold"><i class="fa fa-bars" aria-hidden="true"></i> Example :</label>
                 <select id="examples" class="form-control-sm col-sm-8">
                     <option value="0">Select Example</option>
                     {% for example in examples %} {% if eid == example.id %}
@@ -153,10 +154,10 @@
                     <option value="{{ example.id }}">{{ example.number }} - {{ example.caption }}</option>
                     {% endif %} {% endfor %}
                 </select>
-                <a href="#" class="extra-link col-sm-2" id="download-example">Download Example</a>
+                <a href="#" class="extra-link col-sm-2" id="download-example">Download Example <i class="fa fa-download" aria-hidden="true"></i></a>
             </div>
             <div id="revisions-wrapper" class="form-row form-group">
-                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold">Revision: </label>
+                <label for="disabledInput" class="col-sm-2 col-form-label font-weight-bold"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Revision: </label>
                 <select id="revisions" class="form-control-sm col-sm-3">
                     <option value="">Select a revision</option>
                     {% for key, value in revisions %} {% if value == commit_sha %}
@@ -167,7 +168,8 @@
                     </option>
                     {% endif %} {% endfor %}
                 </select>
-                <label for="disabledInput" class="col-sm-1 col-form-label font-weight-bold">Diff with: </label>
+                <label for="disabledInput" class="col-sm-1 col-form-label font-weight-bold"><i class="fa fa-files-o" aria-hidden="true"></i>
+ Diff with: </label>
                 <select id="revisions-diff" class="form-control-sm col-sm-3">
                     <option value="">Select a revision</option>
                     {% for key, value in revisions %}
@@ -187,7 +189,8 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-4">
-                            <label for="code">R code:</label>
+                            <label for="code"><i class="fa fa-file-code-o" aria-hidden="true"></i>
+ R code:</label>
                         </div>
                         <div class="col-2 float-left">
                             {% if ex_views_count == NULL %}
@@ -226,10 +229,15 @@
                     <textarea id="code" class="form-control" rows="5" placeholder="Write a new code or select existing from above category..." wrap="hard">{{ code }}</textarea>
                     <br>
                     <input type="hidden" id="user_id" name="user_id" value="{{ user_id }}">
-                    <a id="execute" class="btn btn-dark text-white"><span id="execute-inner">Execute</span></a>
+                    <a id="execute" class="btn btn-dark text-white"><span id="execute-inner">
+                    <i class="fa fa-play-circle" aria-hidden="true"></i>
+                     Execute 
+                     <i class="fa fa-cogs" aria-hidden="true"></i>
+                    </span></a>
                      <!-- Trigger the modal with a button -->
                       <!-- <button id="uploaddataset" type="button" class="btn btn-dark text-white" data-toggle="modal" data-target="#uploaddatasetModal">Upload Dataset</button>  -->
-                       <button id="reset" type="button" class="btn btn-dark text-white" data-dismiss="modal">Reset</button>
+                       <button id="reset" type="button" class="btn btn-dark text-white" data-dismiss="modal"><i class="fa fa-undo" aria-hidden="true"></i>
+ Reset</button>
 
                       <!-- Modal -->
                       <div class="modal fade" id="uploaddatasetModal" role="dialog">
@@ -259,7 +267,7 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-10">
-                            <label for="result">Result:</label>
+                            <label for="result"><i class="fa fa-cubes" aria-hidden="true"></i> Result:</label>
                         </div>
                         <div class="col-1">
                             <div class="float-right">
@@ -310,7 +318,7 @@
         </div>
         <div class="row  small">
             <div class="col">
-                <p class="text-center">TBD</p>
+                <p class="text-center"></p>
             </div>
         </div>
         <div class="row">
@@ -549,7 +557,9 @@
 
                 <!-- Modal Header -->
                 <div class="modal-header">
-                    <h5 class="modal-title text-primary"></h5>
+                    <h5 class="modal-title text-primary">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                    </h5>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
 
